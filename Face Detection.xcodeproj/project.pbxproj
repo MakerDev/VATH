@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		414ED3DF2A0FF29900DEC4C7 /* CommunicationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 414ED3DE2A0FF29900DEC4C7 /* CommunicationManager.swift */; };
 		AA5029E024BEECD4006576A4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5029DF24BEECD4006576A4 /* AppDelegate.swift */; };
 		AA5029E224BEECD4006576A4 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5029E124BEECD4006576A4 /* SceneDelegate.swift */; };
 		AA5029E424BEECD4006576A4 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5029E324BEECD4006576A4 /* ViewController.swift */; };
@@ -18,6 +19,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		414ED3D72A0E328200DEC4C7 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = opencv2.framework; path = ../../Downloads/opencv2.framework; sourceTree = "<group>"; };
+		414ED3D92A0E5B0B00DEC4C7 /* Face Detection-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Face Detection-Bridging-Header.h"; sourceTree = "<group>"; };
+		414ED3DE2A0FF29900DEC4C7 /* CommunicationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunicationManager.swift; sourceTree = "<group>"; };
 		AA5029DC24BEECD4006576A4 /* Face Detection.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Face Detection.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA5029DF24BEECD4006576A4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AA5029E124BEECD4006576A4 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -44,6 +48,7 @@
 		AA5029D324BEECD4006576A4 = {
 			isa = PBXGroup;
 			children = (
+				414ED3D72A0E328200DEC4C7 /* opencv2.framework */,
 				AA5029DE24BEECD4006576A4 /* Face Detection */,
 				AA5029DD24BEECD4006576A4 /* Products */,
 			);
@@ -69,6 +74,8 @@
 				AA5029EA24BEECD8006576A4 /* LaunchScreen.storyboard */,
 				AA5029ED24BEECD8006576A4 /* Info.plist */,
 				AA5029F524BEF5EE006576A4 /* LiveFeedViewController.swift */,
+				414ED3D92A0E5B0B00DEC4C7 /* Face Detection-Bridging-Header.h */,
+				414ED3DE2A0FF29900DEC4C7 /* CommunicationManager.swift */,
 			);
 			path = "Face Detection";
 			sourceTree = "<group>";
@@ -105,6 +112,7 @@
 				TargetAttributes = {
 					AA5029DB24BEECD4006576A4 = {
 						CreatedOnToolsVersion = 11.5;
+						LastSwiftMigration = 1420;
 					};
 				};
 			};
@@ -148,6 +156,7 @@
 				AA5029E424BEECD4006576A4 /* ViewController.swift in Sources */,
 				AA5029E024BEECD4006576A4 /* AppDelegate.swift in Sources */,
 				AA5029F424BEEEC2006576A4 /* StillImageViewController.swift in Sources */,
+				414ED3DF2A0FF29900DEC4C7 /* CommunicationManager.swift in Sources */,
 				AA5029E224BEECD4006576A4 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -292,15 +301,19 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 357UTQ5SQ3;
+				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "Face Detection/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.tombaranowicz.Face-Detection";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.Face-Detection";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Face Detection/Face Detection-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -310,15 +323,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 357UTQ5SQ3;
+				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "Face Detection/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.tombaranowicz.Face-Detection";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.Face-Detection";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Face Detection/Face Detection-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};

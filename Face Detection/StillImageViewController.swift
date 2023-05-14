@@ -59,23 +59,22 @@ class StillImageViewController: UIViewController {
     
     private func performVisionRequest(image: CGImage) {
          
-         let faceDetectionRequest = VNDetectFaceRectanglesRequest(completionHandler: self.handleFaceDetectionRequest)
-
-         let requests = [faceDetectionRequest]
-         let imageRequestHandler = VNImageRequestHandler(cgImage: image,
-                                                         orientation: .up,
-                                                         options: [:])
+        let faceDetectionRequest = VNDetectFaceRectanglesRequest(completionHandler: self.handleFaceDetectionRequest)
+        let requests = [faceDetectionRequest]
+        let imageRequestHandler = VNImageRequestHandler(cgImage: image,
+                                                        orientation: .up,
+                                                        options: [:])
          
-         DispatchQueue.global(qos: .userInitiated).async {
-             do {
-                 try imageRequestHandler.perform(requests)
-             } catch let error as NSError {
-                 print(error)
-                 return
-             }
-         }
-     }
-    
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                try imageRequestHandler.perform(requests)
+            } catch let error as NSError {
+                print(error)
+                return
+            }
+        }
+    }
+
     private func handleFaceDetectionRequest(request: VNRequest?, error: Error?) {
         if let requestError = error as NSError? {
             print(requestError)
