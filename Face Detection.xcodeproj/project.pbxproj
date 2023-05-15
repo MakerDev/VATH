@@ -7,7 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3F4762D9EA1F31B9631BA337 /* Pods_Face_Detection.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2077FE5A9242FFC12A38FAEB /* Pods_Face_Detection.framework */; };
 		414ED3DF2A0FF29900DEC4C7 /* CommunicationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 414ED3DE2A0FF29900DEC4C7 /* CommunicationManager.swift */; };
+		419B60A32A10E82B00A47EE9 /* haarcascade_eye.xml in Resources */ = {isa = PBXBuildFile; fileRef = 419B60A12A10E79C00A47EE9 /* haarcascade_eye.xml */; };
+		419E808B2A10E49C00D48156 /* MyOpenCV.mm in Sources */ = {isa = PBXBuildFile; fileRef = 419E808A2A10E49C00D48156 /* MyOpenCV.mm */; };
 		AA5029E024BEECD4006576A4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5029DF24BEECD4006576A4 /* AppDelegate.swift */; };
 		AA5029E224BEECD4006576A4 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5029E124BEECD4006576A4 /* SceneDelegate.swift */; };
 		AA5029E424BEECD4006576A4 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5029E324BEECD4006576A4 /* ViewController.swift */; };
@@ -19,9 +22,16 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		414ED3D72A0E328200DEC4C7 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = opencv2.framework; path = ../../Downloads/opencv2.framework; sourceTree = "<group>"; };
+		2077FE5A9242FFC12A38FAEB /* Pods_Face_Detection.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Face_Detection.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		414ED3D92A0E5B0B00DEC4C7 /* Face Detection-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Face Detection-Bridging-Header.h"; sourceTree = "<group>"; };
 		414ED3DE2A0FF29900DEC4C7 /* CommunicationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunicationManager.swift; sourceTree = "<group>"; };
+		4177A1242A10DB7B005EA6A6 /* PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
+		419B60A12A10E79C00A47EE9 /* haarcascade_eye.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = haarcascade_eye.xml; path = ../../Downloads/haarcascade_eye.xml; sourceTree = "<group>"; };
+		419B60A22A10E7CA00A47EE9 /* haarcascade_eye.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = haarcascade_eye.xml; sourceTree = "<group>"; };
+		419E80892A10E49C00D48156 /* MyOpenCV.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MyOpenCV.h; sourceTree = SOURCE_ROOT; };
+		419E808A2A10E49C00D48156 /* MyOpenCV.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MyOpenCV.mm; sourceTree = SOURCE_ROOT; };
+		4A59FCBA8199381BCE6B8AC5 /* Pods-Face Detection.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Face Detection.debug.xcconfig"; path = "Target Support Files/Pods-Face Detection/Pods-Face Detection.debug.xcconfig"; sourceTree = "<group>"; };
+		69B9190A29084BE44B62DB9D /* Pods-Face Detection.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Face Detection.release.xcconfig"; path = "Target Support Files/Pods-Face Detection/Pods-Face Detection.release.xcconfig"; sourceTree = "<group>"; };
 		AA5029DC24BEECD4006576A4 /* Face Detection.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Face Detection.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA5029DF24BEECD4006576A4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AA5029E124BEECD4006576A4 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -39,18 +49,30 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F4762D9EA1F31B9631BA337 /* Pods_Face_Detection.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		368FC56565BFF5EC5F19A681 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2077FE5A9242FFC12A38FAEB /* Pods_Face_Detection.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		AA5029D324BEECD4006576A4 = {
 			isa = PBXGroup;
 			children = (
-				414ED3D72A0E328200DEC4C7 /* opencv2.framework */,
+				419B60A12A10E79C00A47EE9 /* haarcascade_eye.xml */,
+				4177A1242A10DB7B005EA6A6 /* PrefixHeader.pch */,
 				AA5029DE24BEECD4006576A4 /* Face Detection */,
 				AA5029DD24BEECD4006576A4 /* Products */,
+				BA8E0A13531EFEBDDB880015 /* Pods */,
+				368FC56565BFF5EC5F19A681 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -65,12 +87,15 @@
 		AA5029DE24BEECD4006576A4 /* Face Detection */ = {
 			isa = PBXGroup;
 			children = (
+				419E80892A10E49C00D48156 /* MyOpenCV.h */,
+				419E808A2A10E49C00D48156 /* MyOpenCV.mm */,
 				AA5029DF24BEECD4006576A4 /* AppDelegate.swift */,
 				AA5029E124BEECD4006576A4 /* SceneDelegate.swift */,
 				AA5029F324BEEEC2006576A4 /* StillImageViewController.swift */,
 				AA5029E324BEECD4006576A4 /* ViewController.swift */,
 				AA5029E524BEECD4006576A4 /* Main.storyboard */,
 				AA5029E824BEECD8006576A4 /* Assets.xcassets */,
+				419B60A22A10E7CA00A47EE9 /* haarcascade_eye.xml */,
 				AA5029EA24BEECD8006576A4 /* LaunchScreen.storyboard */,
 				AA5029ED24BEECD8006576A4 /* Info.plist */,
 				AA5029F524BEF5EE006576A4 /* LiveFeedViewController.swift */,
@@ -80,6 +105,15 @@
 			path = "Face Detection";
 			sourceTree = "<group>";
 		};
+		BA8E0A13531EFEBDDB880015 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				4A59FCBA8199381BCE6B8AC5 /* Pods-Face Detection.debug.xcconfig */,
+				69B9190A29084BE44B62DB9D /* Pods-Face Detection.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -87,6 +121,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AA5029F024BEECD8006576A4 /* Build configuration list for PBXNativeTarget "Face Detection" */;
 			buildPhases = (
+				FB6FF38307E9B6B93B546C46 /* [CP] Check Pods Manifest.lock */,
 				AA5029D824BEECD4006576A4 /* Sources */,
 				AA5029D924BEECD4006576A4 /* Frameworks */,
 				AA5029DA24BEECD4006576A4 /* Resources */,
@@ -107,7 +142,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1150;
-				LastUpgradeCheck = 1150;
+				LastUpgradeCheck = 1420;
 				ORGANIZATIONNAME = "Tomasz Baranowicz";
 				TargetAttributes = {
 					AA5029DB24BEECD4006576A4 = {
@@ -139,6 +174,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				419B60A32A10E82B00A47EE9 /* haarcascade_eye.xml in Resources */,
 				AA5029EC24BEECD8006576A4 /* LaunchScreen.storyboard in Resources */,
 				AA5029E924BEECD8006576A4 /* Assets.xcassets in Resources */,
 				AA5029E724BEECD4006576A4 /* Main.storyboard in Resources */,
@@ -146,6 +182,31 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		FB6FF38307E9B6B93B546C46 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Face Detection-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		AA5029D824BEECD4006576A4 /* Sources */ = {
@@ -158,6 +219,7 @@
 				AA5029F424BEEEC2006576A4 /* StillImageViewController.swift in Sources */,
 				414ED3DF2A0FF29900DEC4C7 /* CommunicationManager.swift in Sources */,
 				AA5029E224BEECD4006576A4 /* SceneDelegate.swift in Sources */,
+				419E808B2A10E49C00D48156 /* MyOpenCV.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -209,6 +271,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -223,6 +286,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREFIX_HEADER = "$(SRCROOT)/PrefixHeader.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -269,6 +333,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -281,6 +346,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "$(SRCROOT)/PrefixHeader.pch";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -299,12 +365,14 @@
 		};
 		AA5029F124BEECD8006576A4 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4A59FCBA8199381BCE6B8AC5 /* Pods-Face Detection.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 357UTQ5SQ3;
-				GCC_PREFIX_HEADER = "";
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "$(SRCROOT)/PrefixHeader.pch";
 				INFOPLIST_FILE = "Face Detection/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -314,6 +382,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Face Detection/Face Detection-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_PRECOMPILE_BRIDGING_HEADER = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -321,12 +390,14 @@
 		};
 		AA5029F224BEECD8006576A4 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 69B9190A29084BE44B62DB9D /* Pods-Face Detection.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 357UTQ5SQ3;
-				GCC_PREFIX_HEADER = "";
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "$(SRCROOT)/PrefixHeader.pch";
 				INFOPLIST_FILE = "Face Detection/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -335,6 +406,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.example.Face-Detection";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Face Detection/Face Detection-Bridging-Header.h";
+				SWIFT_PRECOMPILE_BRIDGING_HEADER = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};

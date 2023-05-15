@@ -19,11 +19,14 @@ class LiveFeedViewController: UIViewController {
     private var faceLayers: [CAShapeLayer] = []
     
     private let precisionLabel = UILabel()
+    private let eyeDetectionLabel = UILabel()
     private let messageLabel = UILabel()
+    
     private let buttonTitles = ["2", "3", "5", "6", "9"]
     private var buttons: [UIButton] = []
     private let calibrationButton = UIButton()
     private var isCalibrated = false
+    private var currentImage: CIImage? = nil
     
     private var isCalibrating = false
     private var leftCalibrationConfidenceAverage = 0.0
@@ -31,6 +34,8 @@ class LiveFeedViewController: UIViewController {
     private var leftCalibrationConfidenceList: [Double] = []
     private var rightCalibrationConfidenceList: [Double] = []
     private let maxCalibrationCount = 500
+    private let leftImageView: UIImageView = UIImageView()
+    private let rightImageView: UIImageView = UIImageView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,6 +62,11 @@ class LiveFeedViewController: UIViewController {
         messageLabel.textColor = UIColor.black
         messageLabel.font = UIFont.boldSystemFont(ofSize: 16)
         view.addSubview(messageLabel)
+        
+        eyeDetectionLabel.frame = CGRect(x: 16, y: 200, width: 600, height: 60)
+        eyeDetectionLabel.textColor = UIColor.black
+        eyeDetectionLabel.font = UIFont.boldSystemFont(ofSize: 16)
+        view.addSubview(eyeDetectionLabel)
     }
     
     func setupButtons() {
@@ -121,6 +131,20 @@ class LiveFeedViewController: UIViewController {
                 }
             }
         }
+        
+        let screenSize = UIScreen.main.bounds
+        let imageWidth: CGFloat = 100.0
+        let imageHeight: CGFloat = 100.0
+        self.leftImageView.frame = CGRect(x: 0,
+                                          y: screenSize.height - imageHeight * 2,
+                                          width: imageWidth,
+                                          height: imageHeight)
+        self.rightImageView.frame = CGRect(x: imageWidth + 20,
+                                           y: screenSize.height - imageHeight * 2,
+                                           width: imageWidth,
+                                           height: imageHeight)
+        self.view.addSubview(self.leftImageView)
+        self.view.addSubview(self.rightImageView)
     }
     
     private func setupVideoDataOutput(showPreview: Bool = false) {
@@ -145,13 +169,17 @@ extension LiveFeedViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
         guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
           return
         }
-
+        
+        let ciImage = CIImage(cvPixelBuffer: imageBuffer)
+        self.currentImage = ciImage
+        
         let faceDetectionRequest = VNDetectFaceLandmarksRequest(completionHandler: { (request: VNRequest, error: Error?) in
             DispatchQueue.main.async {
                 self.faceLayers.forEach({ drawing in drawing.removeFromSuperlayer() })
-
+                self.faceLayers = []
+                
                 if let observations = request.results as? [VNFaceObservation] {
-                    self.handleFaceDetectionObservations(observations: observations)
+                    self.handleFaceDetectionObservations(observations: observations, on: ciImage)
                 }
             }
         })
@@ -161,12 +189,12 @@ extension LiveFeedViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
         do {
             try imageRequestHandler.perform([faceDetectionRequest])
         } catch {
-          print(error.localizedDescription)
+            print(error.localizedDescription)
         }
     }
     
     
-    private func handleFaceDetectionObservations(observations: [VNFaceObservation]) {
+    private func handleFaceDetectionObservations(observations: [VNFaceObservation], on image: CIImage) {
         for observation in observations {
             let faceRectConverted = self.previewLayer.layerRectConverted(fromMetadataOutputRect: observation.boundingBox)
             let faceRectanglePath = CGPath(rect: faceRectConverted, transform: nil)
@@ -181,11 +209,31 @@ extension LiveFeedViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             
             var leftPupilPrecision = 0.0
             var rightPupilPrecision = 0.0
+            var isLeftEyeDetected = false
+            var isRightEyeDetected = false
             
             //FACE LANDMARKS
             if let landmarks = observation.landmarks {
                 if let leftEye = landmarks.leftEye {
                     self.handleLandmark(leftEye, faceBoundingBox: faceRectConverted)
+                    if let image = currentImage {
+                        let boundingBox = getFacialRect(image: image, faceBoundingBox: faceRectConverted, isLeft: true)
+                        if let croppedImage = cropImage(image: image, boundingBox: boundingBox) {
+                            self.leftImageView.image = croppedImage
+                            isLeftEyeDetected = MyOpenCV.detectIfExistEyes(in: croppedImage)
+                        }
+                    }
+                }
+                
+                if let rightEye = landmarks.rightEye {
+                    self.handleLandmark(rightEye, faceBoundingBox: faceRectConverted)
+                    if let image = currentImage {
+                        let boundingBox = getFacialRect(image: image, faceBoundingBox: faceRectConverted, isLeft: false)
+                        if let croppedImage = cropImage(image: image, boundingBox: boundingBox) {
+                            self.rightImageView.image = croppedImage
+                            isRightEyeDetected = MyOpenCV.detectIfExistEyes(in: croppedImage)
+                        }
+                    }
                 }
                 
                 if let leftPupil = landmarks.leftPupil {
@@ -193,32 +241,10 @@ extension LiveFeedViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
                     leftPupilPrecision = Double(leftPupil.precisionEstimatesPerPoint![0]) * 100
                 }
                 
-                if let leftEyebrow = landmarks.leftEyebrow {
-                    self.handleLandmark(leftEyebrow, faceBoundingBox: faceRectConverted)
-                }
-                
-                if let rightEye = landmarks.rightEye {
-                    self.handleLandmark(rightEye, faceBoundingBox: faceRectConverted)
-                }
-                
                 if let rightPupil = landmarks.rightPupil {
                     self.handleLandmark(rightPupil, faceBoundingBox: faceRectConverted)
                     // The number of elements in precisionEstimatesPerPoint for a pupil is one.
                     rightPupilPrecision = Double(rightPupil.precisionEstimatesPerPoint![0]) * 100
-                }
-                if let rightEyebrow = landmarks.rightEyebrow {
-                    self.handleLandmark(rightEyebrow, faceBoundingBox: faceRectConverted)
-                }
-
-                if let nose = landmarks.nose {
-                    self.handleLandmark(nose, faceBoundingBox: faceRectConverted)
-                }
-
-                if let outerLips = landmarks.outerLips {
-                    self.handleLandmark(outerLips, faceBoundingBox: faceRectConverted)
-                }
-                if let innerLips = landmarks.innerLips {
-                    self.handleLandmark(innerLips, faceBoundingBox: faceRectConverted)
                 }
             }
             
@@ -232,15 +258,29 @@ extension LiveFeedViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             let precisionLabelText = "Left precision: \(leftPrecisionText), Right precision: \(rightPrecisionText)"
             DispatchQueue.main.async {
                 self.precisionLabel.text = precisionLabelText
+                self.eyeDetectionLabel.text = "Left: \(isLeftEyeDetected)   Right: \(isRightEyeDetected)"
             }
         }
     }
     
-    private func truncatedAppend(targetList: inout [Double], value:Double, maxCount: Int) {
-        targetList.append(value)
+    private func getFacialRect(image:CIImage, faceBoundingBox: CGRect, isLeft:Bool) -> CGRect {
+        let scale = UIScreen.main.scale + 2
+        let scaleX = image.extent.size.width / UIScreen.main.bounds.width
+        let scaleY = image.extent.size.height / UIScreen.main.bounds.height
+        let offsetScaleFactor = 0.1
+        let sizeScaleFactor = 0.2
         
-        if targetList.count >= maxCount {
-            targetList.remove(at: 0)
+        if isLeft {
+            return CGRect(x: (UIScreen.main.bounds.width - faceBoundingBox.origin.x  - faceBoundingBox.size.width) * scaleX,
+                        y: (faceBoundingBox.origin.y + faceBoundingBox.size.height * offsetScaleFactor)*scaleY,
+                        width: faceBoundingBox.size.width * scale * sizeScaleFactor,
+                        height: faceBoundingBox.size.height * scale * sizeScaleFactor)
+        } else {
+            return CGRect(x: (UIScreen.main.bounds.width - faceBoundingBox.origin.x -
+                              faceBoundingBox.size.width * 0.5) * scaleX,
+                         y: (faceBoundingBox.origin.y + faceBoundingBox.size.height * offsetScaleFactor)*scaleY,
+                         width: faceBoundingBox.size.width * scale * sizeScaleFactor,
+                         height: faceBoundingBox.size.height * scale * sizeScaleFactor)
         }
     }
     
@@ -254,12 +294,48 @@ extension LiveFeedViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             })
         landmarkPath.addLines(between: landmarkPathPoints)
         landmarkPath.closeSubpath()
+        
         let landmarkLayer = CAShapeLayer()
         landmarkLayer.path = landmarkPath
         landmarkLayer.fillColor = UIColor.clear.cgColor
         landmarkLayer.strokeColor = UIColor.green.cgColor
+//
+//        self.faceLayers.append(landmarkLayer)
+//        self.view.layer.addSublayer(landmarkLayer)
+    }
+    
+    func cropImage(image: CIImage, boundingBox:CGRect) -> UIImage? {
+        let ciBoundingBox = CGRect(x: boundingBox.origin.x, y: image.extent.height - boundingBox.origin.y - boundingBox.height, width: boundingBox.width, height: boundingBox.height)
+        let croppedImage = image.cropped(to: ciBoundingBox)
+        let context = CIContext()
+        guard let cgImage = context.createCGImage(croppedImage, from: croppedImage.extent) else {
+            return nil
+        }
 
-        self.faceLayers.append(landmarkLayer)
-        self.view.layer.addSublayer(landmarkLayer)
+        return UIImage(cgImage: cgImage)
+    }
+    
+    private func truncatedAppend(targetList: inout [Double], value:Double, maxCount: Int) {
+        targetList.append(value)
+        
+        if targetList.count >= maxCount {
+            targetList.remove(at: 0)
+        }
+    }
+}
+
+extension UIImage {
+    func convertToRGB() -> UIImage? {
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
+        let context = CGContext(data: nil, width: Int(self.size.width), height: Int(self.size.height), bitsPerComponent: self.cgImage!.bitsPerComponent, bytesPerRow: self.cgImage!.bytesPerRow, space: colorSpace, bitmapInfo: bitmapInfo.rawValue)
+        
+        context?.draw(self.cgImage!, in: CGRect(x: 0, y: 0, width: self.size.width, height: self.size.height))
+        
+        if let cgImage = context?.makeImage() {
+            return UIImage(cgImage: cgImage)
+        }
+        
+        return nil
     }
 }
