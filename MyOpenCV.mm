@@ -53,7 +53,7 @@ NSString *cascadePath = [[NSBundle mainBundle] pathForResource:@"haarcascade_eye
     cv::cvtColor(img, grayImg, cv::COLOR_BGR2GRAY);
     
     std::vector<cv::Rect> eyes;
-    eyeCascade.detectMultiScale(grayImg, eyes, 1.2, 5);
+    eyeCascade.detectMultiScale(grayImg, eyes, 1.1, 5);
     
     return eyes.size() > 0;
 }

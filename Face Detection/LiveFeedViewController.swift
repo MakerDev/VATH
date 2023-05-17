@@ -267,7 +267,7 @@ extension LiveFeedViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
         let scale = UIScreen.main.scale + 2
         let scaleX = image.extent.size.width / UIScreen.main.bounds.width
         let scaleY = image.extent.size.height / UIScreen.main.bounds.height
-        let offsetScaleFactor = 0.1
+        let offsetScaleFactor = 0.15
         let sizeScaleFactor = 0.2
         
         if isLeft {
