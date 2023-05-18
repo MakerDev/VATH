@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17132" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
-    <device id="retina6_1" orientation="portrait" appearance="light"/>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17105"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -14,18 +12,18 @@
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="Face_Detection" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hNR-bA-ROJ">
-                                <rect key="frame" x="171" y="438" width="72" height="30"/>
+                                <rect key="frame" x="264.66666666666669" y="285" width="71" height="30"/>
                                 <state key="normal" title="Still Image"/>
                                 <connections>
                                     <segue destination="9IA-Zm-Jsm" kind="show" id="Sy7-3r-UKA"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0Do-Cf-LIN">
-                                <rect key="frame" x="174" y="498" width="66" height="30"/>
+                                <rect key="frame" x="267" y="345" width="66" height="30"/>
                                 <state key="normal" title="Live Feed"/>
                                 <connections>
                                     <segue destination="mwK-UX-TLW" kind="show" id="yZ0-Ze-hv7"/>
@@ -51,7 +49,7 @@
             <objects>
                 <viewController id="mwK-UX-TLW" customClass="LiveFeedViewController" customModule="Face_Detection" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="34e-Mr-dRx">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <viewLayoutGuide key="safeArea" id="yUW-gB-Asb"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -62,16 +60,16 @@
             </objects>
             <point key="canvasLocation" x="1286" y="-122"/>
         </scene>
-        <!--Still Image View Controller-->
+        <!--Distance Measurement View Controller-->
         <scene sceneID="5Uo-j4-1fe">
             <objects>
-                <viewController id="9IA-Zm-Jsm" customClass="StillImageViewController" customModule="Face_Detection" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="9IA-Zm-Jsm" customClass="DistanceMeasurementViewController" customModule="Face_Detection" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="vrZ-Cy-7Pr">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="M1Y-VL-oKM">
-                                <rect key="frame" x="0.0" y="0.0" width="414" height="808"/>
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="580"/>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="BtK-Z3-VfU"/>
