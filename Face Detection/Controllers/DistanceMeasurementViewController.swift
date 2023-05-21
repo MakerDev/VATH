@@ -24,11 +24,13 @@ class DistanceMeasurementViewController: UIViewController {
     }
     
     //TODO: Overlay a small rect region to calculate the average depth value.
-    @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet var imageView: UIImageView! = UIImageView()
     var scaledImageRect: CGRect?
-    
+    private let averageDepthLabel = UILabel()
+    private let rectangleLayer = CAShapeLayer()
     private let preferredWidthResolution = 1920
-    
+    private let rectSize = CGSize(width: 32, height: 32)
+    private let rectangleView = UIView()
     private let videoQueue = DispatchQueue(label: "com.example.facedetection.VideoQueue", qos: .userInteractive)
     
     private(set) var captureSession: AVCaptureSession!
@@ -42,15 +44,12 @@ class DistanceMeasurementViewController: UIViewController {
     
     weak var delegate: CaptureDataReceiver?
     
-    var isFilteringEnabled = true {
-        didSet {
-            depthDataOutput.isFilteringEnabled = isFilteringEnabled
-        }
-    }
+    var isFilteringEnabled = true
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        cameraManager = CameraManager(controller: self)
+
         // Create a texture cache to hold sample buffer textures.
         CVMetalTextureCacheCreate(kCFAllocatorDefault,
                                   nil,
@@ -58,23 +57,71 @@ class DistanceMeasurementViewController: UIViewController {
                                   nil,
                                   &textureCache)
         
-        
         do {
             try setupSession()
         } catch {
             fatalError("Unable to configure the capture session.")
         }
+        
+        imageView.contentMode = .scaleAspectFit
+        imageView.frame = view.bounds
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(imageView)
+        
+        let screenSize = view.bounds.size
+        let rectangleSize = rectSize
+        let rectangleOrigin = CGPoint(
+            x: (screenSize.width - rectangleSize.width) / 2,
+            y: (screenSize.height - rectangleSize.height) / 2
+        )
+        
+        rectangleLayer.strokeColor = UIColor.red.cgColor
+        rectangleLayer.lineWidth = 2.0
+        rectangleLayer.fillColor = UIColor.clear.cgColor
+        rectangleLayer.path = UIBezierPath(rect: CGRect(origin: rectangleOrigin, size: rectangleSize)).cgPath
+        imageView.layer.addSublayer(rectangleLayer)
+        
+        rectangleView.backgroundColor = UIColor.clear
+        rectangleView.layer.borderColor = UIColor.blue.cgColor
+        rectangleView.layer.borderWidth = 2.0
+        rectangleView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.addSubview(rectangleView)
+        
+        NSLayoutConstraint.activate([
+            imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            imageView.topAnchor.constraint(equalTo: view.topAnchor),
+            imageView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            rectangleView.centerXAnchor.constraint(equalTo: imageView.centerXAnchor),
+            rectangleView.centerYAnchor.constraint(equalTo: imageView.centerYAnchor),
+            rectangleView.widthAnchor.constraint(equalToConstant: rectSize.width),
+            rectangleView.heightAnchor.constraint(equalTo: rectangleView.widthAnchor),
+        ])
+        
+        averageDepthLabel.text = "Top-Left Label"
+        averageDepthLabel.textColor = UIColor.black
+        averageDepthLabel.font = UIFont.systemFont(ofSize: 18)
+        averageDepthLabel.sizeToFit()
+        averageDepthLabel.frame.origin = CGPoint(x: 16, y: 80)
+        view.addSubview(averageDepthLabel)
+        
+        cameraManager = CameraManager(controller: self)
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        if let image = UIImage(named: "profile") {
-            imageView.image = image
-            
-            guard let _ = image.cgImage else {
-                return
-            }
-        }
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        // Update the position and size of the red rectangle based on the current screen size
+        let screenSize = view.bounds.size
+        let rectangleSize = rectSize
+        let rectangleOrigin = CGPoint(x: (screenSize.width - rectangleSize.width) / 2, y: (screenSize.height - rectangleSize.height) / 2)
+        
+        rectangleLayer.path = UIBezierPath(rect: CGRect(origin: rectangleOrigin, size: rectangleSize)).cgPath
+        
+        rectangleView.layer.cornerRadius = rectangleView.frame.width / 2.0
     }
+    
     
     private func setupSession() throws {
         captureSession = AVCaptureSession()
@@ -180,6 +227,25 @@ extension DistanceMeasurementViewController: AVCaptureDataOutputSynchronizerDele
         
         guard let pixelBuffer = syncedVideoData.sampleBuffer.imageBuffer,
               let cameraCalibrationData = syncedDepthData.depthData.cameraCalibrationData else { return }
+        let accuracy = syncedDepthData.depthData.depthDataAccuracy
+        
+        //TODO: 계산하는 기능 추가하고, gpu, cpu활용해서 성능체크해보기.
+        let averageDepthValueInCenter = calculateAverageDepthValue(of: syncedDepthData.depthData.depthDataMap,
+                                                                   regionWidth: Int(rectSize.width),
+                                                                   regionHeight: Int(rectSize.height))
+        DispatchQueue.main.async {
+            if let depthImage = self.convertPixelBufferToUIImage(pixelBuffer) {
+                self.imageView.image = self.fixOrientation(for: depthImage)
+            }
+            
+            let formattedAverage = String(format: "%.2f", averageDepthValueInCenter)
+            
+            if accuracy == .absolute {
+                self.averageDepthLabel.text = "Absolute: \(formattedAverage)"
+            } else {
+                self.averageDepthLabel.text = "Relative: \(formattedAverage)"
+            }
+        }
         
         // Package the captured data.
         let data = CameraCapturedData(depth: syncedDepthData.depthData.depthDataMap.texture(withFormat: .r16Float, planeIndex: 0, addToCache: textureCache),
@@ -189,5 +255,70 @@ extension DistanceMeasurementViewController: AVCaptureDataOutputSynchronizerDele
                                       cameraReferenceDimensions: cameraCalibrationData.intrinsicMatrixReferenceDimensions)
         
         delegate?.onNewData(capturedData: data)
+    }
+    
+    private func convertPixelBufferToUIImage(_ pixelBuffer: CVPixelBuffer) -> UIImage? {
+        let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+        let context = CIContext()
+        if let cgImage = context.createCGImage(ciImage, from: ciImage.extent) {
+            let uiImage = UIImage(cgImage: cgImage)
+            return uiImage
+        }
+        return nil
+    }
+    
+    func fixOrientation(for image: UIImage) -> UIImage {
+        if image.imageOrientation == .left {
+            return image
+        }
+        
+        UIGraphicsBeginImageContextWithOptions(image.size, false, image.scale)
+        image.draw(in: CGRect(origin: .zero, size: image.size))
+        let fixedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return fixedImage ?? image
+    }
+    
+    func calculateAverageDepthValue(of pixelBuffer: CVPixelBuffer, regionWidth: Int, regionHeight: Int) -> Float {
+        let pixelFormat = CVPixelBufferGetPixelFormatType(pixelBuffer)
+        let width = CVPixelBufferGetWidth(pixelBuffer)
+        let height = CVPixelBufferGetHeight(pixelBuffer)
+        
+        guard pixelFormat == kCVPixelFormatType_DepthFloat16 || pixelFormat == kCVPixelFormatType_DisparityFloat16 else {
+            return -1 // Unsupported pixel format
+        }
+        
+        CVPixelBufferLockBaseAddress(pixelBuffer, .readOnly)
+        
+        if let baseAddress = CVPixelBufferGetBaseAddress(pixelBuffer) {
+            let bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer)
+            let regionWidth = min(width, regionWidth)
+            let regionHeight = min(height, regionHeight)
+            
+            let regionStartX = (width - regionWidth) / 2
+            let regionStartY = (height - regionHeight) / 2
+            
+            var sum: Float = 0.0
+            
+            for y in 0..<regionHeight {
+                let row = baseAddress.advanced(by: (regionStartY + y) * bytesPerRow).assumingMemoryBound(to: Float16.self)
+                
+                for x in 0..<regionWidth {
+                    let depthValue = row[regionStartX + x]
+                    sum += Float(depthValue)
+                }
+            }
+            
+            let numPixels = regionWidth * regionHeight
+            let averageDepthValue = sum / Float(numPixels)
+            
+            CVPixelBufferUnlockBaseAddress(pixelBuffer, .readOnly)
+            
+            return averageDepthValue
+        } else {
+            CVPixelBufferUnlockBaseAddress(pixelBuffer, .readOnly)
+            return -1
+        }
     }
 }

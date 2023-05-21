@@ -267,11 +267,12 @@ extension LiveFeedViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
         let scale = UIScreen.main.scale + 2
         let scaleX = image.extent.size.width / UIScreen.main.bounds.width
         let scaleY = image.extent.size.height / UIScreen.main.bounds.height
-        let offsetScaleFactor = 0.15
+        let offsetScaleFactor = 0.1
+        let xOffsetScaleFactor = 0.1
         let sizeScaleFactor = 0.2
         
         if isLeft {
-            return CGRect(x: (UIScreen.main.bounds.width - faceBoundingBox.origin.x  - faceBoundingBox.size.width) * scaleX,
+            return CGRect(x: (UIScreen.main.bounds.width - faceBoundingBox.origin.x  - faceBoundingBox.size.width + faceBoundingBox.size.width*xOffsetScaleFactor) * scaleX,
                         y: (faceBoundingBox.origin.y + faceBoundingBox.size.height * offsetScaleFactor)*scaleY,
                         width: faceBoundingBox.size.width * scale * sizeScaleFactor,
                         height: faceBoundingBox.size.height * scale * sizeScaleFactor)
@@ -299,7 +300,7 @@ extension LiveFeedViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
         landmarkLayer.path = landmarkPath
         landmarkLayer.fillColor = UIColor.clear.cgColor
         landmarkLayer.strokeColor = UIColor.green.cgColor
-//
+
 //        self.faceLayers.append(landmarkLayer)
 //        self.view.layer.addSublayer(landmarkLayer)
     }

@@ -13,6 +13,7 @@
 		41734CF72A160618000AC57A /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41734CF62A160618000AC57A /* CameraManager.swift */; };
 		41734CF92A160632000AC57A /* CameraCapturedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41734CF82A160632000AC57A /* CameraCapturedData.swift */; };
 		41734CFC2A160AAC000AC57A /* MetalEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41734CFB2A160AAC000AC57A /* MetalEnvironment.swift */; };
+		417594BE2A1628DA00FDC81D /* shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 417594BD2A1628DA00FDC81D /* shaders.metal */; };
 		419B60A32A10E82B00A47EE9 /* haarcascade_eye.xml in Resources */ = {isa = PBXBuildFile; fileRef = 419B60A12A10E79C00A47EE9 /* haarcascade_eye.xml */; };
 		419E808B2A10E49C00D48156 /* MyOpenCV.mm in Sources */ = {isa = PBXBuildFile; fileRef = 419E808A2A10E49C00D48156 /* MyOpenCV.mm */; };
 		AA5029E024BEECD4006576A4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5029DF24BEECD4006576A4 /* AppDelegate.swift */; };
@@ -33,6 +34,7 @@
 		41734CF62A160618000AC57A /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
 		41734CF82A160632000AC57A /* CameraCapturedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCapturedData.swift; sourceTree = "<group>"; };
 		41734CFB2A160AAC000AC57A /* MetalEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalEnvironment.swift; sourceTree = "<group>"; };
+		417594BD2A1628DA00FDC81D /* shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = shaders.metal; sourceTree = "<group>"; };
 		4177A1242A10DB7B005EA6A6 /* PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
 		419B60A12A10E79C00A47EE9 /* haarcascade_eye.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = haarcascade_eye.xml; path = ../../Downloads/haarcascade_eye.xml; sourceTree = "<group>"; };
 		419B60A22A10E7CA00A47EE9 /* haarcascade_eye.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = haarcascade_eye.xml; sourceTree = "<group>"; };
@@ -86,6 +88,7 @@
 		41734CFA2A160A9F000AC57A /* Metal */ = {
 			isa = PBXGroup;
 			children = (
+				417594BC2A1628A200FDC81D /* Shaders */,
 				41734CFB2A160AAC000AC57A /* MetalEnvironment.swift */,
 			);
 			path = Metal;
@@ -108,6 +111,14 @@
 				419E808A2A10E49C00D48156 /* MyOpenCV.mm */,
 			);
 			path = OpenCVWrapper;
+			sourceTree = "<group>";
+		};
+		417594BC2A1628A200FDC81D /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				417594BD2A1628DA00FDC81D /* shaders.metal */,
+			);
+			path = Shaders;
 			sourceTree = "<group>";
 		};
 		AA5029D324BEECD4006576A4 = {
@@ -265,6 +276,7 @@
 				41734CF42A1604F4000AC57A /* CVPixelBuffer+Extensions.swift in Sources */,
 				414ED3DF2A0FF29900DEC4C7 /* CommunicationManager.swift in Sources */,
 				AA5029E224BEECD4006576A4 /* SceneDelegate.swift in Sources */,
+				417594BE2A1628DA00FDC81D /* shaders.metal in Sources */,
 				41734CFC2A160AAC000AC57A /* MetalEnvironment.swift in Sources */,
 				41734CF72A160618000AC57A /* CameraManager.swift in Sources */,
 				419E808B2A10E49C00D48156 /* MyOpenCV.mm in Sources */,
