@@ -11,6 +11,9 @@ import UIKit
 import Vision
 import CoreGraphics
 import CoreVideo
+import MultipeerConnectivity
+import os
+
 
 class LiveFeedViewController: UIViewController {
     private let captureSession = AVCaptureSession()
@@ -37,19 +40,43 @@ class LiveFeedViewController: UIViewController {
     private let leftImageView: UIImageView = UIImageView()
     private let rightImageView: UIImageView = UIImageView()
     
+    let log = Logger()
+    private let serviceType = "eis-eyesight"
+    private let myPeerId = MCPeerID(displayName: "EISiPhone")
+    private var serviceBrowser: MCNearbyServiceBrowser!
+    var session: MCSession!
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupCamera()
+        
         captureSession.startRunning()
         // Add precision label to the view
         
         setupLabels()
         setupButtons()
+        setupMCService()
+    }
+    
+    deinit {
+        serviceBrowser.stopBrowsingForPeers()
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         self.previewLayer.frame = self.view.frame
+    }
+    
+    func setupMCService() {
+        session = MCSession(peer: myPeerId, securityIdentity: nil, encryptionPreference: .none)
+        serviceBrowser = MCNearbyServiceBrowser(peer: myPeerId, serviceType: serviceType)
+
+        session.delegate = self
+        serviceBrowser.delegate = self
+
+        serviceBrowser.startBrowsingForPeers()
+        
     }
     
     func setupLabels() {
@@ -77,6 +104,8 @@ class LiveFeedViewController: UIViewController {
             let button = UIButton(frame: CGRect(x: CGFloat(index) * buttonWidth, y: buttonYPosition, width: buttonWidth, height: buttonHeight))
             button.setTitle(title, for: .normal)
             button.backgroundColor = .blue
+            button.tag = Int(title)!
+            button.addTarget(self, action: #selector(answerButtonTapped(_:)), for: .touchUpInside)
             view.addSubview(button)
             buttons.append(button)
         }
@@ -88,12 +117,51 @@ class LiveFeedViewController: UIViewController {
         let buttonHeight: CGFloat = 50.0
         let buttonYPosition: CGFloat = self.view.frame.height / 2.0 + buttonHeight / 2.0
         calibrationButton.frame = CGRect(x: 0, y: buttonYPosition, width: self.view.frame.width, height: buttonHeight)
-        calibrationButton.setTitle("Calibration", for: .normal)
+        calibrationButton.setTitle("Change Size", for: .normal)
         calibrationButton.backgroundColor = .green
-        calibrationButton.addTarget(self, action: #selector(calibrationButtonTapped), for: .touchUpInside)
+        calibrationButton.addTarget(self, action: #selector(changeProblemImageSize), for: .touchUpInside)
         view.addSubview(calibrationButton)
     }
+    
+    @objc func changeProblemImageSize() {
+        //TOOD: Append the exact target eye sight when sending this message.
+        if !session.connectedPeers.isEmpty {
+            do {
+                try session.send("Next".data(using: .utf8)!, toPeers: session.connectedPeers, with: .reliable)
+            } catch {
+                log.error("Error for sending: \(String(describing: error))")
+            }
+        }
+    }
+    
+    func displayAnswerResult(isCorrect: Bool) {
+        //TODO: Display the result whether the last answering was correct.
+        log.info("The answering result: \(isCorrect)")
+    }
 
+    func onConnectionStateChanged(peerID: MCPeerID, state: MCSessionState) {
+        if (state == .connected) {
+            log.info("Peer \(peerID) joined this sessions")
+        } else if(state == .connecting) {
+            log.info("Peer \(peerID) is connecting..")
+        } else {
+            log.info("Peer \(peerID) disconnected")
+        }
+        
+        //TODO: Display current connection state.
+    }
+    
+    @objc func answerButtonTapped(_ sender: UIButton) {
+        //TODO: Disable all buttons until the answer results comes.
+        if !session.connectedPeers.isEmpty {
+            do {
+                try session.send(String(sender.tag).data(using: .utf8)!, toPeers: session.connectedPeers, with: .reliable)
+            } catch {
+                log.error("Error for sending: \(String(describing: error))")
+            }
+        }
+    }
+    
     @objc func calibrationButtonTapped() {
         // Handle the calibration button tap here
         if isCalibrating {

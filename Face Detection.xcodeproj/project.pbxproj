@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		3F4762D9EA1F31B9631BA337 /* Pods_Face_Detection.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2077FE5A9242FFC12A38FAEB /* Pods_Face_Detection.framework */; };
 		414ED3DF2A0FF29900DEC4C7 /* CommunicationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 414ED3DE2A0FF29900DEC4C7 /* CommunicationManager.swift */; };
+		416B80F92A1B60F700532A18 /* LiveFeedViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 416B80F82A1B60F700532A18 /* LiveFeedViewController+Extensions.swift */; };
 		41734CF42A1604F4000AC57A /* CVPixelBuffer+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41734CF32A1604F4000AC57A /* CVPixelBuffer+Extensions.swift */; };
 		41734CF72A160618000AC57A /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41734CF62A160618000AC57A /* CameraManager.swift */; };
 		41734CF92A160632000AC57A /* CameraCapturedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41734CF82A160632000AC57A /* CameraCapturedData.swift */; };
@@ -30,6 +31,7 @@
 		2077FE5A9242FFC12A38FAEB /* Pods_Face_Detection.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Face_Detection.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		414ED3D92A0E5B0B00DEC4C7 /* Face Detection-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Face Detection-Bridging-Header.h"; sourceTree = "<group>"; };
 		414ED3DE2A0FF29900DEC4C7 /* CommunicationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunicationManager.swift; sourceTree = "<group>"; };
+		416B80F82A1B60F700532A18 /* LiveFeedViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LiveFeedViewController+Extensions.swift"; sourceTree = "<group>"; };
 		41734CF32A1604F4000AC57A /* CVPixelBuffer+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CVPixelBuffer+Extensions.swift"; sourceTree = "<group>"; };
 		41734CF62A160618000AC57A /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
 		41734CF82A160632000AC57A /* CameraCapturedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCapturedData.swift; sourceTree = "<group>"; };
@@ -100,6 +102,7 @@
 				AA5029F324BEEEC2006576A4 /* DistanceMeasurementViewController.swift */,
 				AA5029E324BEECD4006576A4 /* ViewController.swift */,
 				AA5029F524BEF5EE006576A4 /* LiveFeedViewController.swift */,
+				416B80F82A1B60F700532A18 /* LiveFeedViewController+Extensions.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -278,6 +281,7 @@
 				AA5029E224BEECD4006576A4 /* SceneDelegate.swift in Sources */,
 				417594BE2A1628DA00FDC81D /* shaders.metal in Sources */,
 				41734CFC2A160AAC000AC57A /* MetalEnvironment.swift in Sources */,
+				416B80F92A1B60F700532A18 /* LiveFeedViewController+Extensions.swift in Sources */,
 				41734CF72A160618000AC57A /* CameraManager.swift in Sources */,
 				419E808B2A10E49C00D48156 /* MyOpenCV.mm in Sources */,
 			);

@@ -57,6 +57,11 @@
 	</array>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Allow the app to discover and connect to devices on the local network.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_eis-eyesight._tcp</string>
+		<string>_eis-eyesight._udp</string>
+	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
