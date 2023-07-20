@@ -129,17 +129,6 @@ class LiveFeedViewController: UIViewController {
         ])
     }
     
-    @objc func changeProblemImageSize() {
-        //TOOD: Append the exact target eye sight when sending this message.
-        if !session.connectedPeers.isEmpty {
-            do {
-                try session.send("ChangeNumber x".data(using: .utf8)!, toPeers: session.connectedPeers, with: .reliable)
-            } catch {
-                log.error("Error for sending: \(String(describing: error))")
-            }
-        }
-    }
-    
     func playSound(correct: Bool) {
         let soundName = correct ? "ta-da" : "fail"
         guard let url = Bundle.main.url(forResource: soundName, withExtension: "mp3") else {
@@ -187,22 +176,25 @@ class LiveFeedViewController: UIViewController {
         // Add the dialog view to the main view
         view.addSubview(dialogView)
         
+        let screenHeight = UIScreen.main.bounds.size.height
+        let screenWidth = UIScreen.main.bounds.size.width
+        
         // Set up auto layout constraints for the dialog view
         dialogView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             dialogView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             dialogView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            dialogView.widthAnchor.constraint(equalToConstant: 350),
-            dialogView.heightAnchor.constraint(equalToConstant: 550)
+            dialogView.widthAnchor.constraint(equalToConstant: screenWidth*0.9),
+            dialogView.heightAnchor.constraint(equalToConstant: screenHeight*0.75)
         ])
         
         // Set up auto layout constraints for the image view
         imageView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            imageView.topAnchor.constraint(equalTo: dialogView.topAnchor, constant: 20),
+            imageView.topAnchor.constraint(equalTo: dialogView.topAnchor, constant: 40),
             imageView.leadingAnchor.constraint(equalTo: dialogView.leadingAnchor, constant: 20),
             imageView.trailingAnchor.constraint(equalTo: dialogView.trailingAnchor, constant: -20),
-            imageView.heightAnchor.constraint(equalToConstant: 200)
+            imageView.heightAnchor.constraint(equalToConstant: screenHeight*0.75*0.5)
         ])
         
         // Set up auto layout constraints for the label
@@ -215,7 +207,7 @@ class LiveFeedViewController: UIViewController {
         ])
         
         // Fade out the dialog after 2 seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             UIView.animate(withDuration: 0.5, animations: {
                 self.dialogView.alpha = 0
             }) { _ in
