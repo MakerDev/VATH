@@ -28,9 +28,9 @@ extension LiveFeedViewController: MCSessionDelegate {
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         if let isCorrect = String(data: data, encoding: .utf8) {
-            log.info("didReceive color \(isCorrect)")
+            log.info("didReceive \(isCorrect)")
             DispatchQueue.main.async {
-                self.displayAnswerResult(isCorrect: Bool(isCorrect)!)
+                self.displayAnswerResult(isCorrect: Bool(isCorrect.lowercased())!)
             }
         } else {
             log.info("didReceive invalid value \(data.count) bytes")

@@ -16,6 +16,8 @@ import os
 
 
 class LiveFeedViewController: UIViewController {
+    private final let DETECTION_INTERVAL_MS = 100
+    private var lastDetection = Int64(Date().timeIntervalSince1970 * 1000)
     private let captureSession = AVCaptureSession()
     private lazy var previewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
     private let videoDataOutput = AVCaptureVideoDataOutput()
@@ -24,6 +26,7 @@ class LiveFeedViewController: UIViewController {
     private let precisionLabel = UILabel()
     private let eyeDetectionLabel = UILabel()
     private let messageLabel = UILabel()
+    private var effectPlane: UIView!
     
     private let buttonTitles = ["2", "3", "5", "6", "9"]
     private var buttons: [UIButton] = []
@@ -57,6 +60,12 @@ class LiveFeedViewController: UIViewController {
         setupLabels()
         setupButtons()
         setupMCService()
+        
+        effectPlane = UIView(frame: CGRect(x: 0, y:0,
+                                           width: self.view.frame.width, height: self.view.frame.height))
+        effectPlane.backgroundColor = .green
+        effectPlane.alpha = 0.0
+        view.addSubview(effectPlane)
     }
     
     deinit {
@@ -110,10 +119,10 @@ class LiveFeedViewController: UIViewController {
             buttons.append(button)
         }
         
-        setupCalibrationButton()
+        setupChangeSizeButton()
     }
     
-    func setupCalibrationButton() {
+    func setupChangeSizeButton() {
         let buttonHeight: CGFloat = 50.0
         let buttonYPosition: CGFloat = self.view.frame.height / 2.0 + buttonHeight / 2.0
         calibrationButton.frame = CGRect(x: 0, y: buttonYPosition, width: self.view.frame.width, height: buttonHeight)
@@ -127,16 +136,40 @@ class LiveFeedViewController: UIViewController {
         //TOOD: Append the exact target eye sight when sending this message.
         if !session.connectedPeers.isEmpty {
             do {
-                try session.send("Next".data(using: .utf8)!, toPeers: session.connectedPeers, with: .reliable)
+                try session.send("ChangeNumber x".data(using: .utf8)!, toPeers: session.connectedPeers, with: .reliable)
             } catch {
                 log.error("Error for sending: \(String(describing: error))")
             }
         }
     }
     
+    func startFlashEffect(color: UIColor) {
+        effectPlane.backgroundColor = color
+        UIView.animate(withDuration: 0.1, animations: {
+            self.effectPlane.alpha = 1.0
+        }) {
+            (_) in UIView.animate(withDuration: 0.1, animations: {
+                self.effectPlane.alpha = 0.0
+            })
+        }
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+    }
+    
     func displayAnswerResult(isCorrect: Bool) {
         //TODO: Display the result whether the last answering was correct.
         log.info("The answering result: \(isCorrect)")
+        DispatchQueue.main.async {
+            self.messageLabel.text = "\(isCorrect)"
+        }
+        
+        if (isCorrect) {
+            startFlashEffect(color: .green)
+        } else {
+            startFlashEffect(color: .red)
+        }
     }
 
     func onConnectionStateChanged(peerID: MCPeerID, state: MCSessionState) {
@@ -155,37 +188,10 @@ class LiveFeedViewController: UIViewController {
         //TODO: Disable all buttons until the answer results comes.
         if !session.connectedPeers.isEmpty {
             do {
-                try session.send(String(sender.tag).data(using: .utf8)!, toPeers: session.connectedPeers, with: .reliable)
+                try session.send(("Answer " + String(sender.tag)).data(using: .utf8)!, toPeers: session.connectedPeers, with: .reliable)
             } catch {
                 log.error("Error for sending: \(String(describing: error))")
             }
-        }
-    }
-    
-    @objc func calibrationButtonTapped() {
-        // Handle the calibration button tap here
-        if isCalibrating {
-            self.isCalibrating = false
-            self.isCalibrated = true
-            calibrationButton.setTitle("Calibration", for: .normal)
-            calibrationButton.backgroundColor = .green
-            
-            self.calibrationButton.setTitle("Calibration", for: .normal)
-            self.leftCalibrationConfidenceAverage = Double(leftCalibrationConfidenceList.reduce(0, +))
-            self.leftCalibrationConfidenceAverage = Double(leftCalibrationConfidenceAverage) / Double(leftCalibrationConfidenceList.count)
-            self.rightCalibrationConfidenceAverage = Double(rightCalibrationConfidenceList.reduce(0, +))
-            self.rightCalibrationConfidenceAverage = Double(rightCalibrationConfidenceAverage) / Double(rightCalibrationConfidenceList.count)
-            
-            DispatchQueue.main.async {
-                let leftAverageString = String(format: "%.4f", self.leftCalibrationConfidenceAverage)
-                let rightAverageString = String(format: "%.4f", self.rightCalibrationConfidenceAverage)
-                
-                self.messageLabel.text = "Left Avg: \(leftAverageString), Right Avg: \(rightAverageString)"
-            }
-        } else {
-            isCalibrating = true
-            calibrationButton.setTitle("Calibrating", for: .normal)
-            calibrationButton.backgroundColor = .red
         }
     }
 
@@ -200,6 +206,7 @@ class LiveFeedViewController: UIViewController {
             }
         }
         
+        
         let screenSize = UIScreen.main.bounds
         let imageWidth: CGFloat = 100.0
         let imageHeight: CGFloat = 100.0
@@ -211,8 +218,8 @@ class LiveFeedViewController: UIViewController {
                                            y: screenSize.height - imageHeight * 2,
                                            width: imageWidth,
                                            height: imageHeight)
-        self.view.addSubview(self.leftImageView)
-        self.view.addSubview(self.rightImageView)
+//        self.view.addSubview(self.leftImageView)
+//        self.view.addSubview(self.rightImageView)
     }
     
     private func setupVideoDataOutput(showPreview: Bool = false) {
@@ -263,6 +270,12 @@ extension LiveFeedViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
     
     
     private func handleFaceDetectionObservations(observations: [VNFaceObservation], on image: CIImage) {
+        let currentTimestamp = Int64(Date().timeIntervalSince1970 * 1000)
+        if currentTimestamp - lastDetection <= DETECTION_INTERVAL_MS {
+            return
+        }
+        
+        //TODO: 눈 detection만 framerate 줄이게 수정하기.
         for observation in observations {
             let faceRectConverted = self.previewLayer.layerRectConverted(fromMetadataOutputRect: observation.boundingBox)
             let faceRectanglePath = CGPath(rect: faceRectConverted, transform: nil)
@@ -274,6 +287,8 @@ extension LiveFeedViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             
             self.faceLayers.append(faceLayer)
             self.view.layer.addSublayer(faceLayer)
+            let currentTimestamp = Int64(Date().timeIntervalSince1970 * 1000)
+
             
             var leftPupilPrecision = 0.0
             var rightPupilPrecision = 0.0
@@ -284,6 +299,8 @@ extension LiveFeedViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             if let landmarks = observation.landmarks {
                 if let leftEye = landmarks.leftEye {
                     self.handleLandmark(leftEye, faceBoundingBox: faceRectConverted)
+                    
+                    
                     if let image = currentImage {
                         let boundingBox = getFacialRect(image: image, faceBoundingBox: faceRectConverted, isLeft: true)
                         if let croppedImage = cropImage(image: image, boundingBox: boundingBox) {
@@ -295,6 +312,7 @@ extension LiveFeedViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
                 
                 if let rightEye = landmarks.rightEye {
                     self.handleLandmark(rightEye, faceBoundingBox: faceRectConverted)
+               
                     if let image = currentImage {
                         let boundingBox = getFacialRect(image: image, faceBoundingBox: faceRectConverted, isLeft: false)
                         if let croppedImage = cropImage(image: image, boundingBox: boundingBox) {
@@ -320,15 +338,17 @@ extension LiveFeedViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
                 truncatedAppend(targetList: &self.leftCalibrationConfidenceList, value: leftPupilPrecision, maxCount: self.maxCalibrationCount)
                 truncatedAppend(targetList: &self.rightCalibrationConfidenceList, value: rightPupilPrecision, maxCount: self.maxCalibrationCount)
             }
-            
-            let leftPrecisionText = String(format: "%.4f", leftPupilPrecision)
-            let rightPrecisionText = String(format: "%.4f", rightPupilPrecision)
-            let precisionLabelText = "Left precision: \(leftPrecisionText), Right precision: \(rightPrecisionText)"
+//            let leftPrecisionText = String(format: "%.4f", leftPupilPrecision)
+//            let rightPrecisionText = String(format: "%.4f", rightPupilPrecision)
+//            let precisionLabelText = "Left precision: \(leftPrecisionText), Right precision: \(rightPrecisionText)"
             DispatchQueue.main.async {
-                self.precisionLabel.text = precisionLabelText
-                self.eyeDetectionLabel.text = "Left: \(isLeftEyeDetected)   Right: \(isRightEyeDetected)"
+//                self.precisionLabel.text = precisionLabelText
+                // As the captured image is mirrored, left and right detection results should be reversly displayed.
+                self.eyeDetectionLabel.text = "Left: \(isRightEyeDetected)   Right: \(isLeftEyeDetected)"
             }
         }
+        
+        lastDetection = currentTimestamp
     }
     
     private func getFacialRect(image:CIImage, faceBoundingBox: CGRect, isLeft:Bool) -> CGRect {
