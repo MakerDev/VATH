@@ -15,6 +15,8 @@
 		41734CF92A160632000AC57A /* CameraCapturedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41734CF82A160632000AC57A /* CameraCapturedData.swift */; };
 		41734CFC2A160AAC000AC57A /* MetalEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41734CFB2A160AAC000AC57A /* MetalEnvironment.swift */; };
 		417594BE2A1628DA00FDC81D /* shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 417594BD2A1628DA00FDC81D /* shaders.metal */; };
+		418A541D2A695CE900A295E0 /* gift_box.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 418A541C2A695CE900A295E0 /* gift_box.jpeg */; };
+		418A541F2A69646900A295E0 /* ta-da.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 418A541E2A69646900A295E0 /* ta-da.mp3 */; };
 		419B60A32A10E82B00A47EE9 /* haarcascade_eye.xml in Resources */ = {isa = PBXBuildFile; fileRef = 419B60A12A10E79C00A47EE9 /* haarcascade_eye.xml */; };
 		419E808B2A10E49C00D48156 /* MyOpenCV.mm in Sources */ = {isa = PBXBuildFile; fileRef = 419E808A2A10E49C00D48156 /* MyOpenCV.mm */; };
 		AA5029E024BEECD4006576A4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5029DF24BEECD4006576A4 /* AppDelegate.swift */; };
@@ -38,6 +40,8 @@
 		41734CFB2A160AAC000AC57A /* MetalEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalEnvironment.swift; sourceTree = "<group>"; };
 		417594BD2A1628DA00FDC81D /* shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = shaders.metal; sourceTree = "<group>"; };
 		4177A1242A10DB7B005EA6A6 /* PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
+		418A541C2A695CE900A295E0 /* gift_box.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = gift_box.jpeg; sourceTree = "<group>"; };
+		418A541E2A69646900A295E0 /* ta-da.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "ta-da.mp3"; sourceTree = "<group>"; };
 		419B60A12A10E79C00A47EE9 /* haarcascade_eye.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = haarcascade_eye.xml; path = ../../Downloads/haarcascade_eye.xml; sourceTree = "<group>"; };
 		419B60A22A10E7CA00A47EE9 /* haarcascade_eye.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = haarcascade_eye.xml; sourceTree = "<group>"; };
 		419E80892A10E49C00D48156 /* MyOpenCV.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MyOpenCV.h; path = "Face Detection/OpenCVWrapper/MyOpenCV.h"; sourceTree = SOURCE_ROOT; };
@@ -155,6 +159,8 @@
 				AA5029DF24BEECD4006576A4 /* AppDelegate.swift */,
 				AA5029E124BEECD4006576A4 /* SceneDelegate.swift */,
 				AA5029E524BEECD4006576A4 /* Main.storyboard */,
+				418A541C2A695CE900A295E0 /* gift_box.jpeg */,
+				418A541E2A69646900A295E0 /* ta-da.mp3 */,
 				AA5029E824BEECD8006576A4 /* Assets.xcassets */,
 				419B60A22A10E7CA00A47EE9 /* haarcascade_eye.xml */,
 				AA5029EA24BEECD8006576A4 /* LaunchScreen.storyboard */,
@@ -234,6 +240,8 @@
 			files = (
 				419B60A32A10E82B00A47EE9 /* haarcascade_eye.xml in Resources */,
 				AA5029EC24BEECD8006576A4 /* LaunchScreen.storyboard in Resources */,
+				418A541F2A69646900A295E0 /* ta-da.mp3 in Resources */,
+				418A541D2A695CE900A295E0 /* gift_box.jpeg in Resources */,
 				AA5029E924BEECD8006576A4 /* Assets.xcassets in Resources */,
 				AA5029E724BEECD4006576A4 /* Main.storyboard in Resources */,
 			);

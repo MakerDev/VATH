@@ -22,15 +22,14 @@ class LiveFeedViewController: UIViewController {
     private lazy var previewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
     private let videoDataOutput = AVCaptureVideoDataOutput()
     private var faceLayers: [CAShapeLayer] = []
+    private var score = 0
     
     private let precisionLabel = UILabel()
     private let eyeDetectionLabel = UILabel()
     private let messageLabel = UILabel()
-    private var effectPlane: UIView!
     
-    private let buttonTitles = ["2", "3", "5", "6", "9"]
+    private let buttonTitles = ["2", "3", "5"]
     private var buttons: [UIButton] = []
-    private var isCalibrated = false
     private var currentImage: CIImage? = nil
     
     private var isCalibrating = false
@@ -41,12 +40,15 @@ class LiveFeedViewController: UIViewController {
     private let maxCalibrationCount = 500
     private let leftImageView: UIImageView = UIImageView()
     private let rightImageView: UIImageView = UIImageView()
+    private let dialogView: UIView = UIView()
     
     let log = Logger()
     private let serviceType = "eis-eyesight"
     private let myPeerId = MCPeerID(displayName: "EISiPhone")
     private var serviceBrowser: MCNearbyServiceBrowser!
     var session: MCSession!
+    
+    private var audioPlayer: AVAudioPlayer?
     
     
     override func viewDidLoad() {
@@ -59,12 +61,7 @@ class LiveFeedViewController: UIViewController {
         setupLabels()
         setupButtons()
         setupMCService()
-        
-        effectPlane = UIView(frame: CGRect(x: 0, y:0,
-                                           width: self.view.frame.width, height: self.view.frame.height))
-        effectPlane.backgroundColor = .green
-        effectPlane.alpha = 0.0
-        view.addSubview(effectPlane)
+        showAnswerEffect(correct: true)
     }
     
     deinit {
@@ -84,7 +81,6 @@ class LiveFeedViewController: UIViewController {
         serviceBrowser.delegate = self
 
         serviceBrowser.startBrowsingForPeers()
-        
     }
     
     func setupLabels() {
@@ -105,18 +101,32 @@ class LiveFeedViewController: UIViewController {
     }
     
     func setupButtons() {
-        let buttonWidth: CGFloat = self.view.frame.width / CGFloat(buttonTitles.count)
-        let buttonHeight: CGFloat = 50.0
-        let buttonYPosition: CGFloat = self.view.frame.height / 2.0 - buttonHeight / 2.0
-        for (index, title) in buttonTitles.enumerated() {
-            let button = UIButton(frame: CGRect(x: CGFloat(index) * buttonWidth, y: buttonYPosition, width: buttonWidth, height: buttonHeight))
+        for (_, title) in buttonTitles.enumerated() {
+            // let button = UIButton(frame: CGRect(x: CGFloat(index) * buttonWidth, y: buttonYPosition, width: buttonWidth, height: buttonHeight))
+            let button = UIButton(type: .system)
+            button.titleLabel?.font = UIFont.systemFont(ofSize: 24)
+            button.setTitleColor(.white, for: .normal)
             button.setTitle(title, for: .normal)
-            button.backgroundColor = .blue
+            button.backgroundColor = .link
             button.tag = Int(title)!
             button.addTarget(self, action: #selector(answerButtonTapped(_:)), for: .touchUpInside)
-            view.addSubview(button)
             buttons.append(button)
         }
+        
+        let stackView = UIStackView(arrangedSubviews: buttons)
+        stackView.axis = .vertical
+        stackView.distribution = .fillEqually
+        stackView.spacing = 16
+        
+        view.addSubview(stackView)
+        
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            stackView.topAnchor.constraint(equalTo: view.topAnchor),
+            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            stackView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
     }
     
     @objc func changeProblemImageSize() {
@@ -130,19 +140,88 @@ class LiveFeedViewController: UIViewController {
         }
     }
     
-    func startFlashEffect(color: UIColor) {
-        effectPlane.backgroundColor = color
-        UIView.animate(withDuration: 0.1, animations: {
-            self.effectPlane.alpha = 1.0
-        }) {
-            (_) in UIView.animate(withDuration: 0.1, animations: {
-                self.effectPlane.alpha = 0.0
-            })
+    func playSound(correct: Bool) {
+        let soundName = correct ? "ta-da" : "fail"
+        guard let url = Bundle.main.url(forResource: soundName, withExtension: "mp3") else {
+            return
+        }
+        
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            try AVAudioSession.sharedInstance().setActive(true)
+            audioPlayer = try AVAudioPlayer(contentsOf: url, fileTypeHint: AVFileType.mp3.rawValue)
+            audioPlayer?.play()
+        } catch let error {
+            print(error.localizedDescription)
         }
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
+    func showAnswerEffect(correct: Bool) {
+        // Create the dialog view
+        dialogView.backgroundColor = UIColor.white
+        dialogView.layer.cornerRadius = 12
+        dialogView.layer.shadowColor = UIColor.gray.cgColor
+        dialogView.layer.shadowOffset = CGSize(width: 0, height: 2)
+        dialogView.layer.shadowOpacity = 0.8
+        dialogView.layer.shadowRadius = 4
+        
+        
+        let imageView = UIImageView(image: UIImage(named: "gift_box.png"))
+        imageView.contentMode = .scaleAspectFit
+        dialogView.addSubview(imageView)
+        
+        
+        let label = UILabel()
+        if correct {
+            label.text = "축하합니다~!! \(score)점 획득!"
+            playSound(correct: true)
+        } else {
+            label.text = "아쉽게 틀렸어요. 다른 문양을 맞춰봐요!"
+        }
+        
+        label.font = UIFont.boldSystemFont(ofSize: 24)
+        label.textColor = UIColor.black
+        label.textAlignment = .center
+        dialogView.addSubview(label)
+        
+        // Add the dialog view to the main view
+        view.addSubview(dialogView)
+        
+        // Set up auto layout constraints for the dialog view
+        dialogView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            dialogView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            dialogView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            dialogView.widthAnchor.constraint(equalToConstant: 350),
+            dialogView.heightAnchor.constraint(equalToConstant: 550)
+        ])
+        
+        // Set up auto layout constraints for the image view
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            imageView.topAnchor.constraint(equalTo: dialogView.topAnchor, constant: 20),
+            imageView.leadingAnchor.constraint(equalTo: dialogView.leadingAnchor, constant: 20),
+            imageView.trailingAnchor.constraint(equalTo: dialogView.trailingAnchor, constant: -20),
+            imageView.heightAnchor.constraint(equalToConstant: 200)
+        ])
+        
+        // Set up auto layout constraints for the label
+        label.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            label.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20),
+            label.leadingAnchor.constraint(equalTo: dialogView.leadingAnchor, constant: 20),
+            label.trailingAnchor.constraint(equalTo: dialogView.trailingAnchor, constant: -20),
+            label.bottomAnchor.constraint(equalTo: dialogView.bottomAnchor, constant: -20)
+        ])
+        
+        // Fade out the dialog after 2 seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            UIView.animate(withDuration: 0.5, animations: {
+                self.dialogView.alpha = 0
+            }) { _ in
+                self.dialogView.removeFromSuperview()
+            }
+        }
     }
     
     func displayAnswerResult(isCorrect: Bool) {
@@ -151,11 +230,12 @@ class LiveFeedViewController: UIViewController {
         DispatchQueue.main.async {
             self.messageLabel.text = "\(isCorrect)"
         }
-        
+
         if (isCorrect) {
-            startFlashEffect(color: .green)
+            score += 10
+            showAnswerEffect(correct: true)
         } else {
-            startFlashEffect(color: .red)
+            showAnswerEffect(correct: false)
         }
     }
 
@@ -181,7 +261,11 @@ class LiveFeedViewController: UIViewController {
             }
         }
     }
-
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+    }
+    
     private func setupCamera() {
         let deviceDiscoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: .video, position: .front)
         if let device = deviceDiscoverySession.devices.first {
@@ -192,7 +276,6 @@ class LiveFeedViewController: UIViewController {
                 }
             }
         }
-        
         
         let screenSize = UIScreen.main.bounds
         let imageWidth: CGFloat = 100.0
