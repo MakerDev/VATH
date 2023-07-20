@@ -30,7 +30,6 @@ class LiveFeedViewController: UIViewController {
     
     private let buttonTitles = ["2", "3", "5", "6", "9"]
     private var buttons: [UIButton] = []
-    private let calibrationButton = UIButton()
     private var isCalibrated = false
     private var currentImage: CIImage? = nil
     
@@ -74,7 +73,7 @@ class LiveFeedViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        self.previewLayer.frame = self.view.frame
+        // self.previewLayer.frame = self.view.frame
     }
     
     func setupMCService() {
@@ -118,18 +117,6 @@ class LiveFeedViewController: UIViewController {
             view.addSubview(button)
             buttons.append(button)
         }
-        
-        setupChangeSizeButton()
-    }
-    
-    func setupChangeSizeButton() {
-        let buttonHeight: CGFloat = 50.0
-        let buttonYPosition: CGFloat = self.view.frame.height / 2.0 + buttonHeight / 2.0
-        calibrationButton.frame = CGRect(x: 0, y: buttonYPosition, width: self.view.frame.width, height: buttonHeight)
-        calibrationButton.setTitle("Change Size", for: .normal)
-        calibrationButton.backgroundColor = .green
-        calibrationButton.addTarget(self, action: #selector(changeProblemImageSize), for: .touchUpInside)
-        view.addSubview(calibrationButton)
     }
     
     @objc func changeProblemImageSize() {
@@ -201,7 +188,7 @@ class LiveFeedViewController: UIViewController {
             if let deviceInput = try? AVCaptureDeviceInput(device: device) {
                 if captureSession.canAddInput(deviceInput) {
                     captureSession.addInput(deviceInput)
-                    setupVideoDataOutput(showPreview: true)
+                    setupVideoDataOutput(showPreview: false)
                 }
             }
         }
@@ -286,10 +273,9 @@ extension LiveFeedViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             faceLayer.strokeColor = UIColor.yellow.cgColor
             
             self.faceLayers.append(faceLayer)
-            self.view.layer.addSublayer(faceLayer)
+            // self.view.layer.addSublayer(faceLayer)
             let currentTimestamp = Int64(Date().timeIntervalSince1970 * 1000)
 
-            
             var leftPupilPrecision = 0.0
             var rightPupilPrecision = 0.0
             var isLeftEyeDetected = false
