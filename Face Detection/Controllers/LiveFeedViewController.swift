@@ -49,6 +49,8 @@ class LiveFeedViewController: UIViewController {
     var session: MCSession!
     
     private var audioPlayer: AVAudioPlayer?
+    private var isTargetLeftEye = false
+    private var isTestRunning = false
     
     
     override func viewDidLoad() {
@@ -56,12 +58,14 @@ class LiveFeedViewController: UIViewController {
         setupCamera()
         
         captureSession.startRunning()
-        // Add precision label to the view
-        
-        setupLabels()
+
         setupButtons()
         setupMCService()
-        showAnswerEffect(correct: true)
+        setupLabels()
+        
+        DispatchQueue.main.async {
+            self.promptTargetEyeSelection()
+        }
     }
     
     deinit {
@@ -70,7 +74,27 @@ class LiveFeedViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        // self.previewLayer.frame = self.view.frame
+        self.previewLayer.frame = self.view.frame
+    }
+    
+    func promptTargetEyeSelection() {
+        let alertController = UIAlertController(title: "검사 타겟", message: "어느 쪽 눈의 시력 검사를 진행하시나요?", preferredStyle: .alert)
+        
+        let option1Action = UIAlertAction(title: "왼쪽", style: .default) { _ in
+            self.isTargetLeftEye = true
+            self.isTestRunning = true
+        }
+        
+        let option2Action = UIAlertAction(title: "오른쪽", style: .default) { _ in
+            self.isTargetLeftEye = false
+            self.isTestRunning = true
+        }
+        
+        alertController.addAction(option1Action)
+        alertController.addAction(option2Action)
+        
+        // Present the alert controller
+        present(alertController, animated: true, completion: nil)
     }
     
     func setupMCService() {
@@ -84,31 +108,21 @@ class LiveFeedViewController: UIViewController {
     }
     
     func setupLabels() {
-        precisionLabel.frame = CGRect(x: 16, y: 16, width: 600, height: 60)
-        precisionLabel.textColor = UIColor.black
-        precisionLabel.font = UIFont.boldSystemFont(ofSize: 16)
-        view.addSubview(precisionLabel)
-        
-        messageLabel.frame = CGRect(x: 16, y: 100, width: 600, height: 60)
-        messageLabel.textColor = UIColor.black
-        messageLabel.font = UIFont.boldSystemFont(ofSize: 16)
-        view.addSubview(messageLabel)
-        
-        eyeDetectionLabel.frame = CGRect(x: 16, y: 200, width: 600, height: 60)
+        eyeDetectionLabel.frame = CGRect(x: 16, y: 30, width: 600, height: 60)
         eyeDetectionLabel.textColor = UIColor.black
         eyeDetectionLabel.font = UIFont.boldSystemFont(ofSize: 16)
         view.addSubview(eyeDetectionLabel)
     }
     
     func setupButtons() {
-        for (_, title) in buttonTitles.enumerated() {
+        for (_, number) in buttonTitles.enumerated() {
             // let button = UIButton(frame: CGRect(x: CGFloat(index) * buttonWidth, y: buttonYPosition, width: buttonWidth, height: buttonHeight))
             let button = UIButton(type: .system)
             button.titleLabel?.font = UIFont.systemFont(ofSize: 24)
             button.setTitleColor(.white, for: .normal)
-            button.setTitle(title, for: .normal)
-            button.backgroundColor = .link
-            button.tag = Int(title)!
+            button.setTitle(number, for: .normal)
+            button.backgroundColor = #colorLiteral(red: 0, green: 0.7947641015, blue: 0.8564413786, alpha: 1)
+            button.tag = Int(number)!
             button.addTarget(self, action: #selector(answerButtonTapped(_:)), for: .touchUpInside)
             buttons.append(button)
         }
@@ -131,21 +145,23 @@ class LiveFeedViewController: UIViewController {
     
     func playSound(correct: Bool) {
         let soundName = correct ? "ta-da" : "fail"
-        guard let url = Bundle.main.url(forResource: soundName, withExtension: "mp3") else {
-            return
-        }
-        
-        do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
-            try AVAudioSession.sharedInstance().setActive(true)
-            audioPlayer = try AVAudioPlayer(contentsOf: url, fileTypeHint: AVFileType.mp3.rawValue)
-            audioPlayer?.play()
-        } catch let error {
-            print(error.localizedDescription)
-        }
+        AudioController.playSound(soundName: soundName)
     }
     
     func showAnswerEffect(correct: Bool) {
+        let overlayView = UIView()
+        overlayView.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+        view.addSubview(overlayView)
+        
+        // Set up auto layout constraints for the overlay view
+        overlayView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            overlayView.topAnchor.constraint(equalTo: view.topAnchor),
+            overlayView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            overlayView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            overlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+        
         // Create the dialog view
         dialogView.backgroundColor = UIColor.white
         dialogView.layer.cornerRadius = 12
@@ -154,18 +170,19 @@ class LiveFeedViewController: UIViewController {
         dialogView.layer.shadowOpacity = 0.8
         dialogView.layer.shadowRadius = 4
         
-        
-        let imageView = UIImageView(image: UIImage(named: "gift_box.png"))
+        let imageName = correct ? "gift_box.png" : "fail.png"
+        let imageView = UIImageView(image: UIImage(named: imageName))
         imageView.contentMode = .scaleAspectFit
         dialogView.addSubview(imageView)
         
-        
         let label = UILabel()
+        label.numberOfLines = 2
         if correct {
             label.text = "축하합니다~!! \(score)점 획득!"
             playSound(correct: true)
         } else {
             label.text = "아쉽게 틀렸어요. 다른 문양을 맞춰봐요!"
+            playSound(correct: false)
         }
         
         label.font = UIFont.boldSystemFont(ofSize: 24)
@@ -174,7 +191,8 @@ class LiveFeedViewController: UIViewController {
         dialogView.addSubview(label)
         
         // Add the dialog view to the main view
-        view.addSubview(dialogView)
+//        view.addSubview(dialogView)
+        overlayView.addSubview(dialogView)
         
         let screenHeight = UIScreen.main.bounds.size.height
         let screenWidth = UIScreen.main.bounds.size.width
@@ -206,12 +224,17 @@ class LiveFeedViewController: UIViewController {
             label.bottomAnchor.constraint(equalTo: dialogView.bottomAnchor, constant: -20)
         ])
         
+        self.dialogView.alpha = 1
+        overlayView.alpha = 1
         // Fade out the dialog after 2 seconds
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             UIView.animate(withDuration: 0.5, animations: {
                 self.dialogView.alpha = 0
+                overlayView.alpha = 0
             }) { _ in
                 self.dialogView.removeFromSuperview()
+                overlayView.removeFromSuperview()
+                label.removeFromSuperview()
             }
         }
     }
@@ -264,7 +287,7 @@ class LiveFeedViewController: UIViewController {
             if let deviceInput = try? AVCaptureDeviceInput(device: device) {
                 if captureSession.canAddInput(deviceInput) {
                     captureSession.addInput(deviceInput)
-                    setupVideoDataOutput(showPreview: false)
+                    setupVideoDataOutput(showPreview: true)
                 }
             }
         }
@@ -287,7 +310,7 @@ class LiveFeedViewController: UIViewController {
     private func setupVideoDataOutput(showPreview: Bool = false) {
         if showPreview {
             self.previewLayer.videoGravity = .resizeAspectFill
-            self.view.layer.addSublayer(self.previewLayer)
+            // self.view.layer.addSublayer(self.previewLayer)
             self.previewLayer.frame = self.view.frame
         }
         
@@ -349,7 +372,6 @@ extension LiveFeedViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             
             self.faceLayers.append(faceLayer)
             // self.view.layer.addSublayer(faceLayer)
-            let currentTimestamp = Int64(Date().timeIntervalSince1970 * 1000)
 
             var leftPupilPrecision = 0.0
             var rightPupilPrecision = 0.0

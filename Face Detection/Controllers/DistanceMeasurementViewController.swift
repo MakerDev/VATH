@@ -33,6 +33,17 @@ class DistanceMeasurementViewController: UIViewController {
     private let rectangleView = UIView()
     private let videoQueue = DispatchQueue(label: "com.example.facedetection.VideoQueue", qos: .userInteractive)
     
+    private let errorMarginMeter:Float = 0.3
+    private let stabilizationLatencyMs = 3000
+    private var lastRecordTimestamp = Int64(Date().timeIntervalSince1970 * 1000)
+    private var lastCaptureTimestamp = Int64(Date().timeIntervalSince1970 * 1000)
+    
+    private let captureIntervalMs = 10
+    private let distanceRecordIntervalMs = 250
+    private var distanceQueue: [Float] = []
+    private let targetDistanceMeter:Float = 5.0
+    private var isDoneMeasuring = false
+    
     private(set) var captureSession: AVCaptureSession!
     
     private var photoOutput: AVCapturePhotoOutput!
@@ -105,6 +116,14 @@ class DistanceMeasurementViewController: UIViewController {
         averageDepthLabel.sizeToFit()
         averageDepthLabel.frame.origin = CGPoint(x: 16, y: 80)
         view.addSubview(averageDepthLabel)
+        
+        let informationLabel = UILabel()
+        informationLabel.numberOfLines = 2
+        informationLabel.textColor = .white
+        informationLabel.frame.origin = CGPoint(x: UIScreen.main.bounds.size.width / 2, y: 10)
+        informationLabel.text = "모니터 정중앙에 표시를 맞춰주시고\n5m가 되었을때 3초이상 유지해주세요."
+        informationLabel.font =  UIFont.boldSystemFont(ofSize: 20)
+        view.addSubview(informationLabel)
         
         cameraManager = CameraManager(controller: self)
     }
@@ -221,6 +240,13 @@ extension DistanceMeasurementViewController: AVCaptureDataOutputSynchronizerDele
     
     func dataOutputSynchronizer(_ synchronizer: AVCaptureDataOutputSynchronizer,
                                 didOutput synchronizedDataCollection: AVCaptureSynchronizedDataCollection) {
+        let currentTimestamp = Int64(Date().timeIntervalSince1970 * 1000)
+        
+//        if currentTimestamp - lastCaptureTimestamp <= captureIntervalMs {
+//            return
+//        }
+//        lastCaptureTimestamp = currentTimestamp
+        
         // Retrieve the synchronized depth and sample buffer container objects.
         guard let syncedDepthData = synchronizedDataCollection.synchronizedData(for: depthDataOutput) as? AVCaptureSynchronizedDepthData,
               let syncedVideoData = synchronizedDataCollection.synchronizedData(for: videoDataOutput) as? AVCaptureSynchronizedSampleBufferData else { return }
@@ -229,10 +255,31 @@ extension DistanceMeasurementViewController: AVCaptureDataOutputSynchronizerDele
               let cameraCalibrationData = syncedDepthData.depthData.cameraCalibrationData else { return }
         let accuracy = syncedDepthData.depthData.depthDataAccuracy
         
-        //TODO: 계산하는 기능 추가하고, gpu, cpu활용해서 성능체크해보기.
+        //gpu, cpu활용해서 성능체크해보기.
         let averageDepthValueInCenter = calculateAverageDepthValue(of: syncedDepthData.depthData.depthDataMap,
                                                                    regionWidth: Int(rectSize.width),
                                                                    regionHeight: Int(rectSize.height))
+        
+        if currentTimestamp - lastRecordTimestamp > distanceRecordIntervalMs {
+            let maxCount = stabilizationLatencyMs / distanceRecordIntervalMs
+            if distanceQueue.count > maxCount {
+                distanceQueue.removeFirst()
+            }
+            
+            distanceQueue.append(averageDepthValueInCenter)
+            lastRecordTimestamp = currentTimestamp
+            if distanceQueue.count >= maxCount {
+                let averageDistance = Float(distanceQueue.reduce(0, +)) / Float(distanceQueue.count)
+                
+                if (targetDistanceMeter + errorMarginMeter > averageDistance) &&
+                    (averageDistance > targetDistanceMeter - errorMarginMeter) && !isDoneMeasuring {
+                    //TODO: 확인 프롬프트 띄워주기
+                    AudioController.playSound(soundName: "ok-to-go", extensionType: "wav")
+                    isDoneMeasuring = true
+                }
+            }
+        }
+        
         DispatchQueue.main.async {
             if let depthImage = self.convertPixelBufferToUIImage(pixelBuffer) {
                 self.imageView.image = self.fixOrientation(for: depthImage)
