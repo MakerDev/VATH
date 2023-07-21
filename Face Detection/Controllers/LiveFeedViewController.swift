@@ -17,6 +17,9 @@ import os
 
 class LiveFeedViewController: UIViewController {
     private final let DETECTION_INTERVAL_MS = 100
+    private final let EYE_DETECTION_INTERVAL_MS = 100
+    private final let EYE_AVERAGE_INTERVAL_MS = 1000
+    
     private var lastDetection = Int64(Date().timeIntervalSince1970 * 1000)
     private let captureSession = AVCaptureSession()
     private lazy var previewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
@@ -32,12 +35,6 @@ class LiveFeedViewController: UIViewController {
     private var buttons: [UIButton] = []
     private var currentImage: CIImage? = nil
     
-    private var isCalibrating = false
-    private var leftCalibrationConfidenceAverage = 0.0
-    private var rightCalibrationConfidenceAverage = 0.0
-    private var leftCalibrationConfidenceList: [Double] = []
-    private var rightCalibrationConfidenceList: [Double] = []
-    private let maxCalibrationCount = 500
     private let leftImageView: UIImageView = UIImageView()
     private let rightImageView: UIImageView = UIImageView()
     private let dialogView: UIView = UIView()
@@ -48,10 +45,11 @@ class LiveFeedViewController: UIViewController {
     private var serviceBrowser: MCNearbyServiceBrowser!
     var session: MCSession!
     
-    private var audioPlayer: AVAudioPlayer?
     private var isTargetLeftEye = false
     private var isTestRunning = false
     
+    private var eyeDetectionResultList: [Int] = []
+    private var lastEyeDetection: Int64 = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -372,9 +370,7 @@ extension LiveFeedViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             
             self.faceLayers.append(faceLayer)
             // self.view.layer.addSublayer(faceLayer)
-
-            var leftPupilPrecision = 0.0
-            var rightPupilPrecision = 0.0
+            
             var isLeftEyeDetected = false
             var isRightEyeDetected = false
             
@@ -407,31 +403,58 @@ extension LiveFeedViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
                 
                 if let leftPupil = landmarks.leftPupil {
                     self.handleLandmark(leftPupil, faceBoundingBox: faceRectConverted)
-                    leftPupilPrecision = Double(leftPupil.precisionEstimatesPerPoint![0]) * 100
                 }
                 
                 if let rightPupil = landmarks.rightPupil {
                     self.handleLandmark(rightPupil, faceBoundingBox: faceRectConverted)
-                    // The number of elements in precisionEstimatesPerPoint for a pupil is one.
-                    rightPupilPrecision = Double(rightPupil.precisionEstimatesPerPoint![0]) * 100
                 }
             }
             
-            if self.isCalibrating {
-                truncatedAppend(targetList: &self.leftCalibrationConfidenceList, value: leftPupilPrecision, maxCount: self.maxCalibrationCount)
-                truncatedAppend(targetList: &self.rightCalibrationConfidenceList, value: rightPupilPrecision, maxCount: self.maxCalibrationCount)
-            }
-//            let leftPrecisionText = String(format: "%.4f", leftPupilPrecision)
-//            let rightPrecisionText = String(format: "%.4f", rightPupilPrecision)
-//            let precisionLabelText = "Left precision: \(leftPrecisionText), Right precision: \(rightPrecisionText)"
+            checkIfEyeClosed(isLeftEyeDetected: isRightEyeDetected, isRightDetected: isLeftEyeDetected)
             DispatchQueue.main.async {
-//                self.precisionLabel.text = precisionLabelText
                 // As the captured image is mirrored, left and right detection results should be reversly displayed.
                 self.eyeDetectionLabel.text = "Left: \(isRightEyeDetected)   Right: \(isLeftEyeDetected)"
             }
         }
         
         lastDetection = currentTimestamp
+    }
+    
+    private func checkIfEyeClosed(isLeftEyeDetected:Bool, isRightDetected: Bool, threshold: Double = 0.7) {
+        let currentTimestamp = Int64(Date().timeIntervalSince1970 * 1000)
+        
+        if currentTimestamp - lastEyeDetection > EYE_DETECTION_INTERVAL_MS {
+            let detectionResult = isTargetLeftEye ? isLeftEyeDetected : isRightDetected
+            let isEyeProperlyCovered = detectionResult ? 0 : 1 // 0 point for unconvered, 1 point for covered
+            let maxCount = EYE_AVERAGE_INTERVAL_MS / EYE_DETECTION_INTERVAL_MS
+            
+            eyeDetectionResultList.append(isEyeProperlyCovered)
+
+            if eyeDetectionResultList.count > maxCount {
+                eyeDetectionResultList.removeFirst()
+            }
+            
+            if eyeDetectionResultList.count < maxCount {
+                lastEyeDetection = currentTimestamp
+                return
+            }
+            
+            let scoreSum = eyeDetectionResultList.reduce(0, +)
+            
+            // 만약 한 번 경고 했으면 최소 3초 이후에 안내하기 위해서 리스트를 리셋하고, 마지막 디텍션 값을 2초 후로 옮기기.
+            if Double(scoreSum) < Double(maxCount) * threshold {
+                //TODO: Warn
+                let soundName = isTargetLeftEye ? "left-eye-voice" : "right-eye-voice"
+                AudioController.playSound(soundName: soundName)
+                eyeDetectionResultList.removeAll()
+                lastEyeDetection = currentTimestamp + 3000
+                
+                return
+            }
+            
+            lastEyeDetection = currentTimestamp
+        }
+        
     }
     
     private func getFacialRect(image:CIImage, faceBoundingBox: CGRect, isLeft:Bool) -> CGRect {
