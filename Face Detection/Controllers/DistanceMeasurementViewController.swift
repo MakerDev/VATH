@@ -33,7 +33,7 @@ class DistanceMeasurementViewController: UIViewController {
     private let rectangleView = UIView()
     private let videoQueue = DispatchQueue(label: "com.example.facedetection.VideoQueue", qos: .userInteractive)
     
-    private let errorMarginMeter:Float = 0.3
+    private let errorMarginMeter:Float = 0.1
     private let stabilizationLatencyMs = 3000
     private var lastRecordTimestamp = Int64(Date().timeIntervalSince1970 * 1000)
     private var lastCaptureTimestamp = Int64(Date().timeIntervalSince1970 * 1000)
@@ -237,6 +237,92 @@ class DistanceMeasurementViewController: UIViewController {
 
 
 extension DistanceMeasurementViewController: AVCaptureDataOutputSynchronizerDelegate {
+    func showDoneEffect() {
+        let overlayView = UIView()
+        overlayView.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+        view.addSubview(overlayView)
+        
+        // Set up auto layout constraints for the overlay view
+        overlayView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            overlayView.topAnchor.constraint(equalTo: view.topAnchor),
+            overlayView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            overlayView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            overlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+        
+        let dialogView = UIView()
+        // Create the dialog view
+        dialogView.backgroundColor = UIColor.white
+        dialogView.layer.cornerRadius = 12
+        dialogView.layer.shadowColor = UIColor.gray.cgColor
+        dialogView.layer.shadowOffset = CGSize(width: 0, height: 2)
+        dialogView.layer.shadowOpacity = 0.8
+        dialogView.layer.shadowRadius = 4
+        
+        let imageName = "great"
+        let imageView = UIImageView(image: UIImage(named: imageName))
+        imageView.contentMode = .scaleAspectFit
+        dialogView.addSubview(imageView)
+        
+        let label = UILabel()
+        label.numberOfLines = 2
+        label.text = "거리 설정이 완료되었습니다!"
+        
+        label.font = UIFont.boldSystemFont(ofSize: 24)
+        label.textColor = UIColor.black
+        label.textAlignment = .center
+        dialogView.addSubview(label)
+        
+        // Add the dialog view to the main view
+//        view.addSubview(dialogView)
+        overlayView.addSubview(dialogView)
+        
+        let screenHeight = UIScreen.main.bounds.size.height
+        let screenWidth = UIScreen.main.bounds.size.width
+        
+        // Set up auto layout constraints for the dialog view
+        dialogView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            dialogView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            dialogView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            dialogView.widthAnchor.constraint(equalToConstant: screenWidth*0.9),
+            dialogView.heightAnchor.constraint(equalToConstant: screenHeight*0.75)
+        ])
+        
+        // Set up auto layout constraints for the image view
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            imageView.topAnchor.constraint(equalTo: dialogView.topAnchor, constant: 40),
+            imageView.leadingAnchor.constraint(equalTo: dialogView.leadingAnchor, constant: 20),
+            imageView.trailingAnchor.constraint(equalTo: dialogView.trailingAnchor, constant: -20),
+            imageView.heightAnchor.constraint(equalToConstant: screenHeight*0.75*0.5)
+        ])
+        
+        // Set up auto layout constraints for the label
+        label.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            label.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20),
+            label.leadingAnchor.constraint(equalTo: dialogView.leadingAnchor, constant: 20),
+            label.trailingAnchor.constraint(equalTo: dialogView.trailingAnchor, constant: -20),
+            label.bottomAnchor.constraint(equalTo: dialogView.bottomAnchor, constant: -20)
+        ])
+        
+        dialogView.alpha = 1
+        overlayView.alpha = 1
+        // Fade out the dialog after 2 seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+            UIView.animate(withDuration: 0.5, animations: {
+                dialogView.alpha = 0
+                overlayView.alpha = 0
+            }) { _ in
+                dialogView.removeFromSuperview()
+                overlayView.removeFromSuperview()
+                label.removeFromSuperview()
+            }
+        }
+    }
+    
     
     func dataOutputSynchronizer(_ synchronizer: AVCaptureDataOutputSynchronizer,
                                 didOutput synchronizedDataCollection: AVCaptureSynchronizedDataCollection) {
@@ -274,7 +360,14 @@ extension DistanceMeasurementViewController: AVCaptureDataOutputSynchronizerDele
                 if (targetDistanceMeter + errorMarginMeter > averageDistance) &&
                     (averageDistance > targetDistanceMeter - errorMarginMeter) && !isDoneMeasuring {
                     //TODO: 확인 프롬프트 띄워주기
+                    DispatchQueue.main.async {
+                        self.showDoneEffect()
+                    }
+                    
                     AudioController.playSound(soundName: "ok-to-go", extensionType: "wav")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        AudioController.playSound(soundName: "distance-ok-voice")
+                    }
                     isDoneMeasuring = true
                 }
             }

@@ -20,6 +20,11 @@
 		418A54212A6987C800A295E0 /* AudioController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418A54202A6987C800A295E0 /* AudioController.swift */; };
 		418A54232A69A0B100A295E0 /* fail.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 418A54222A69A0B100A295E0 /* fail.jpeg */; };
 		418A54252A69A1B500A295E0 /* ok-to-go.wav in Resources */ = {isa = PBXBuildFile; fileRef = 418A54242A69A1B500A295E0 /* ok-to-go.wav */; };
+		418A54272A69A86600A295E0 /* great.png in Resources */ = {isa = PBXBuildFile; fileRef = 418A54262A69A86600A295E0 /* great.png */; };
+		418A542F2A6A56FB00A295E0 /* distance-ok-voice.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 418A542B2A6A56FB00A295E0 /* distance-ok-voice.mp3 */; };
+		418A54302A6A56FB00A295E0 /* right-eye-voice.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 418A542C2A6A56FB00A295E0 /* right-eye-voice.mp3 */; };
+		418A54312A6A56FB00A295E0 /* test-done-voice.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 418A542D2A6A56FB00A295E0 /* test-done-voice.mp3 */; };
+		418A54322A6A56FB00A295E0 /* left-eye-voice.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 418A542E2A6A56FB00A295E0 /* left-eye-voice.mp3 */; };
 		419B60A32A10E82B00A47EE9 /* haarcascade_eye.xml in Resources */ = {isa = PBXBuildFile; fileRef = 419B60A12A10E79C00A47EE9 /* haarcascade_eye.xml */; };
 		419E808B2A10E49C00D48156 /* MyOpenCV.mm in Sources */ = {isa = PBXBuildFile; fileRef = 419E808A2A10E49C00D48156 /* MyOpenCV.mm */; };
 		AA5029E024BEECD4006576A4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5029DF24BEECD4006576A4 /* AppDelegate.swift */; };
@@ -48,6 +53,11 @@
 		418A54202A6987C800A295E0 /* AudioController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioController.swift; sourceTree = "<group>"; };
 		418A54222A69A0B100A295E0 /* fail.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = fail.jpeg; sourceTree = "<group>"; };
 		418A54242A69A1B500A295E0 /* ok-to-go.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "ok-to-go.wav"; sourceTree = "<group>"; };
+		418A54262A69A86600A295E0 /* great.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = great.png; sourceTree = "<group>"; };
+		418A542B2A6A56FB00A295E0 /* distance-ok-voice.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "distance-ok-voice.mp3"; sourceTree = "<group>"; };
+		418A542C2A6A56FB00A295E0 /* right-eye-voice.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "right-eye-voice.mp3"; sourceTree = "<group>"; };
+		418A542D2A6A56FB00A295E0 /* test-done-voice.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "test-done-voice.mp3"; sourceTree = "<group>"; };
+		418A542E2A6A56FB00A295E0 /* left-eye-voice.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "left-eye-voice.mp3"; sourceTree = "<group>"; };
 		419B60A12A10E79C00A47EE9 /* haarcascade_eye.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = haarcascade_eye.xml; path = ../../Downloads/haarcascade_eye.xml; sourceTree = "<group>"; };
 		419B60A22A10E7CA00A47EE9 /* haarcascade_eye.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = haarcascade_eye.xml; sourceTree = "<group>"; };
 		419E80892A10E49C00D48156 /* MyOpenCV.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MyOpenCV.h; path = "Face Detection/OpenCVWrapper/MyOpenCV.h"; sourceTree = SOURCE_ROOT; };
@@ -135,9 +145,42 @@
 			path = Shaders;
 			sourceTree = "<group>";
 		};
+		418A54282A6A56AA00A295E0 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				418A542A2A6A56B800A295E0 /* Sounds */,
+				418A54292A6A56B200A295E0 /* Images */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		418A54292A6A56B200A295E0 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				418A54222A69A0B100A295E0 /* fail.jpeg */,
+				418A541C2A695CE900A295E0 /* gift_box.jpeg */,
+				418A54262A69A86600A295E0 /* great.png */,
+			);
+			path = Images;
+			sourceTree = "<group>";
+		};
+		418A542A2A6A56B800A295E0 /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				418A541E2A69646900A295E0 /* ta-da.mp3 */,
+				418A542B2A6A56FB00A295E0 /* distance-ok-voice.mp3 */,
+				418A542E2A6A56FB00A295E0 /* left-eye-voice.mp3 */,
+				418A542C2A6A56FB00A295E0 /* right-eye-voice.mp3 */,
+				418A542D2A6A56FB00A295E0 /* test-done-voice.mp3 */,
+				418A54242A69A1B500A295E0 /* ok-to-go.wav */,
+			);
+			path = Sounds;
+			sourceTree = "<group>";
+		};
 		AA5029D324BEECD4006576A4 = {
 			isa = PBXGroup;
 			children = (
+				418A54282A6A56AA00A295E0 /* Resources */,
 				419B60A12A10E79C00A47EE9 /* haarcascade_eye.xml */,
 				4177A1242A10DB7B005EA6A6 /* PrefixHeader.pch */,
 				AA5029DE24BEECD4006576A4 /* Face Detection */,
@@ -166,10 +209,6 @@
 				AA5029DF24BEECD4006576A4 /* AppDelegate.swift */,
 				AA5029E124BEECD4006576A4 /* SceneDelegate.swift */,
 				AA5029E524BEECD4006576A4 /* Main.storyboard */,
-				418A54222A69A0B100A295E0 /* fail.jpeg */,
-				418A541C2A695CE900A295E0 /* gift_box.jpeg */,
-				418A541E2A69646900A295E0 /* ta-da.mp3 */,
-				418A54242A69A1B500A295E0 /* ok-to-go.wav */,
 				AA5029E824BEECD8006576A4 /* Assets.xcassets */,
 				419B60A22A10E7CA00A47EE9 /* haarcascade_eye.xml */,
 				AA5029EA24BEECD8006576A4 /* LaunchScreen.storyboard */,
@@ -248,12 +287,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				419B60A32A10E82B00A47EE9 /* haarcascade_eye.xml in Resources */,
+				418A54322A6A56FB00A295E0 /* left-eye-voice.mp3 in Resources */,
 				AA5029EC24BEECD8006576A4 /* LaunchScreen.storyboard in Resources */,
 				418A54232A69A0B100A295E0 /* fail.jpeg in Resources */,
+				418A54272A69A86600A295E0 /* great.png in Resources */,
 				418A541F2A69646900A295E0 /* ta-da.mp3 in Resources */,
 				418A541D2A695CE900A295E0 /* gift_box.jpeg in Resources */,
 				418A54252A69A1B500A295E0 /* ok-to-go.wav in Resources */,
+				418A54312A6A56FB00A295E0 /* test-done-voice.mp3 in Resources */,
+				418A54302A6A56FB00A295E0 /* right-eye-voice.mp3 in Resources */,
 				AA5029E924BEECD8006576A4 /* Assets.xcassets in Resources */,
+				418A542F2A6A56FB00A295E0 /* distance-ok-voice.mp3 in Resources */,
 				AA5029E724BEECD4006576A4 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
