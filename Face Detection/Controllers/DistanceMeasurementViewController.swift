@@ -33,15 +33,15 @@ class DistanceMeasurementViewController: UIViewController {
     private let rectangleView = UIView()
     private let videoQueue = DispatchQueue(label: "com.example.facedetection.VideoQueue", qos: .userInteractive)
     
-    private let errorMarginMeter:Float = 0.1
-    private let stabilizationLatencyMs = 3000
+    private let errorMarginMeter:Float = 0.2
+    private let stabilizationLatencyMs = 2000
     private var lastRecordTimestamp = Int64(Date().timeIntervalSince1970 * 1000)
     private var lastCaptureTimestamp = Int64(Date().timeIntervalSince1970 * 1000)
     
     private let captureIntervalMs = 10
     private let distanceRecordIntervalMs = 250
     private var distanceQueue: [Float] = []
-    private let targetDistanceMeter:Float = 5.0
+    private let targetDistanceMeter:Float = 4.0
     private var isDoneMeasuring = false
     
     private(set) var captureSession: AVCaptureSession!
@@ -348,17 +348,29 @@ extension DistanceMeasurementViewController: AVCaptureDataOutputSynchronizerDele
         
         if currentTimestamp - lastRecordTimestamp > distanceRecordIntervalMs {
             let maxCount = stabilizationLatencyMs / distanceRecordIntervalMs
+            
+            distanceQueue.append(averageDepthValueInCenter)
             if distanceQueue.count > maxCount {
                 distanceQueue.removeFirst()
             }
             
-            distanceQueue.append(averageDepthValueInCenter)
             lastRecordTimestamp = currentTimestamp
             if distanceQueue.count >= maxCount {
-                let averageDistance = Float(distanceQueue.reduce(0, +)) / Float(distanceQueue.count)
+                // let averageDistance = Float(distanceQueue.reduce(0, +)) / Float(distanceQueue.count)
+                var pass = true
+                var nOutliers = 0
+                for i in distanceQueue {
+                    if !(targetDistanceMeter - errorMarginMeter < i &&
+                         i < targetDistanceMeter + errorMarginMeter) {
+                        nOutliers += 1
+                    }
+                }
                 
-                if (targetDistanceMeter + errorMarginMeter > averageDistance) &&
-                    (averageDistance > targetDistanceMeter - errorMarginMeter) && !isDoneMeasuring {
+                if Double(nOutliers) > Double(distanceQueue.count) * 0.10 {
+                    pass = false
+                }
+                
+                if pass && !isDoneMeasuring {
                     //TODO: 확인 프롬프트 띄워주기
                     DispatchQueue.main.async {
                         self.showDoneEffect()
