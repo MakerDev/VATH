@@ -27,10 +27,16 @@ extension LiveFeedViewController: MCSessionDelegate {
     }
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        if let isCorrect = String(data: data, encoding: .utf8) {
-            log.info("didReceive \(isCorrect)")
+        if let receivedString = String(data: data, encoding: .utf8) {
+            log.info("didReceive \(receivedString)")
+            
+            if receivedString.lowercased().starts(with: "end") {
+                let testResult = Double(receivedString.split(separator: " ")[1])
+                
+            }
+            
             DispatchQueue.main.async {
-                self.displayAnswerResult(isCorrect: Bool(isCorrect.lowercased())!)
+                self.displayAnswerResult(isCorrect: Bool(receivedString.lowercased())!)
             }
         } else {
             log.info("didReceive invalid value \(data.count) bytes")

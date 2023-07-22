@@ -26,6 +26,7 @@ class LiveFeedViewController: UIViewController {
     private let videoDataOutput = AVCaptureVideoDataOutput()
     private var faceLayers: [CAShapeLayer] = []
     private var score = 0
+    private var buttonsEnabled = true // Buttons are disabled when clicked until the result response will come from the server.
     
     private let precisionLabel = UILabel()
     private let eyeDetectionLabel = UILabel()
@@ -141,12 +142,7 @@ class LiveFeedViewController: UIViewController {
         ])
     }
     
-    func playSound(correct: Bool) {
-        let soundName = correct ? "ta-da" : "fail"
-        AudioController.playSound(soundName: soundName)
-    }
-    
-    func showAnswerEffect(correct: Bool) {
+    func showAnswerEffect(imageName: String, labelText: String, soundName: String, keepAlive:Bool = false) {
         let overlayView = UIView()
         overlayView.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         view.addSubview(overlayView)
@@ -168,20 +164,14 @@ class LiveFeedViewController: UIViewController {
         dialogView.layer.shadowOpacity = 0.8
         dialogView.layer.shadowRadius = 4
         
-        let imageName = correct ? "gift_box.png" : "fail.png"
         let imageView = UIImageView(image: UIImage(named: imageName))
         imageView.contentMode = .scaleAspectFit
         dialogView.addSubview(imageView)
         
         let label = UILabel()
         label.numberOfLines = 2
-        if correct {
-            label.text = "축하합니다~!! \(score)점 획득!"
-            playSound(correct: true)
-        } else {
-            label.text = "아쉽게 틀렸어요. 다른 문양을 맞춰봐요!"
-            playSound(correct: false)
-        }
+        label.text = labelText
+        AudioController.playSound(soundName: soundName)
         
         label.font = UIFont.boldSystemFont(ofSize: 24)
         label.textColor = UIColor.black
@@ -224,6 +214,11 @@ class LiveFeedViewController: UIViewController {
         
         self.dialogView.alpha = 1
         overlayView.alpha = 1
+        
+        if keepAlive {
+            return
+        }
+        
         // Fade out the dialog after 2 seconds
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             UIView.animate(withDuration: 0.5, animations: {
@@ -237,18 +232,27 @@ class LiveFeedViewController: UIViewController {
         }
     }
     
+    func endTest(result: Double) {
+        let resultString = String(format: "%.1f", result)
+        showAnswerEffect(imageName: "congraturation",
+                         labelText: "수고하셨습니다! 검사결과는 \(resultString)입니다!",
+                         soundName: "congraturation",
+                         keepAlive: true)
+    }
+    
     func displayAnswerResult(isCorrect: Bool) {
         //TODO: Display the result whether the last answering was correct.
         log.info("The answering result: \(isCorrect)")
-        DispatchQueue.main.async {
-            self.messageLabel.text = "\(isCorrect)"
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            self.buttonsEnabled = true
         }
 
         if (isCorrect) {
             score += 10
-            showAnswerEffect(correct: true)
+            showAnswerEffect(imageName: "gift_box", labelText: "축하합니다~!! \(score)점 획득!", soundName: "ta-da")
         } else {
-            showAnswerEffect(correct: false)
+            showAnswerEffect(imageName: "fail", labelText: "아쉽게 틀렸어요. 다른 문양을 맞춰봐요!", soundName: "fail")
         }
     }
 
@@ -265,10 +269,14 @@ class LiveFeedViewController: UIViewController {
     }
     
     @objc func answerButtonTapped(_ sender: UIButton) {
-        //TODO: Disable all buttons until the answer results comes.
+        if !buttonsEnabled {
+            return
+        }
+        
         if !session.connectedPeers.isEmpty {
             do {
                 try session.send(("Answer " + String(sender.tag)).data(using: .utf8)!, toPeers: session.connectedPeers, with: .reliable)
+                buttonsEnabled = false
             } catch {
                 log.error("Error for sending: \(String(describing: error))")
             }
