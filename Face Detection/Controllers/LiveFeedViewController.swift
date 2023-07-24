@@ -53,6 +53,8 @@ class LiveFeedViewController: UIViewController {
     private var lastEyeDetection: Int64 = 0
     
     private var communicationManager: CommunicationManager?
+    private var ipDialogView: UIView!
+    private var ipTextField: UITextField!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,16 +65,7 @@ class LiveFeedViewController: UIViewController {
         setupButtons()
         setupMCService()
         setupLabels()
-        
-        DispatchQueue.main.async {
-            self.promptTargetEyeSelection()
-        }
-        
-        //TODO: Change to enter IP information
-        communicationManager = CommunicationManager()
-        communicationManager?.onDataReceived = { message in
-            self.handleReceivedResult(message: message)
-        }
+        setupDialog()
     }
     
     func handleReceivedResult(message: String) {
@@ -90,7 +83,7 @@ class LiveFeedViewController: UIViewController {
         else
         {
             DispatchQueue.main.async {
-                if let isCorrect = Bool(message.filter { !$0.isWhitespace }.lowercased()) {
+                if let isCorrect = Bool(message.lowercased()) {
                     self.displayAnswerResult(isCorrect: isCorrect)
                 }
             }
@@ -104,6 +97,98 @@ class LiveFeedViewController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         self.previewLayer.frame = self.view.frame
+    }
+    
+    func setupDialog() {
+        // Create a semi-transparent background view
+        ipDialogView = UIView()
+        ipDialogView.translatesAutoresizingMaskIntoConstraints = false
+        ipDialogView.backgroundColor = UIColor.black.withAlphaComponent(0.7)
+        view.addSubview(ipDialogView)
+        
+        NSLayoutConstraint.activate([
+            ipDialogView.topAnchor.constraint(equalTo: view.topAnchor),
+            ipDialogView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            ipDialogView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            ipDialogView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+        
+        // Create the dialog view
+        let ipDialogBackground = UIView()
+        ipDialogBackground.translatesAutoresizingMaskIntoConstraints = false
+        ipDialogBackground.backgroundColor = UIColor.white
+        ipDialogBackground.layer.cornerRadius = 10
+        ipDialogView.addSubview(ipDialogBackground)
+        
+        NSLayoutConstraint.activate([
+            ipDialogBackground.centerXAnchor.constraint(equalTo: ipDialogView.centerXAnchor),
+            ipDialogBackground.centerYAnchor.constraint(equalTo: ipDialogView.centerYAnchor),
+            ipDialogBackground.widthAnchor.constraint(equalTo: ipDialogView.widthAnchor, multiplier: 0.8),
+            ipDialogBackground.heightAnchor.constraint(equalTo: ipDialogView.heightAnchor, multiplier: 0.8)
+        ])
+        
+        // Create the text field
+        ipTextField = UITextField()
+        ipTextField.translatesAutoresizingMaskIntoConstraints = false
+        ipTextField.borderStyle = .roundedRect
+        ipTextField.placeholder = "Enter your text"
+        ipDialogBackground.addSubview(ipTextField)
+        
+        NSLayoutConstraint.activate([
+            ipTextField.topAnchor.constraint(equalTo: ipDialogBackground.topAnchor, constant: 20),
+            ipTextField.leadingAnchor.constraint(equalTo: ipDialogBackground.leadingAnchor, constant: 20),
+            ipTextField.trailingAnchor.constraint(equalTo: ipDialogBackground.trailingAnchor, constant: -20),
+            ipTextField.heightAnchor.constraint(equalToConstant: 30)
+        ])
+        
+        // Create the "Skip" button
+        let skipButton = UIButton(type: .system)
+        skipButton.translatesAutoresizingMaskIntoConstraints = false
+        skipButton.setTitle("Skip", for: .normal)
+        skipButton.addTarget(self, action: #selector(skipButtonTapped), for: .touchUpInside)
+        ipDialogBackground.addSubview(skipButton)
+        
+        // Create the "Ok" button
+        let okButton = UIButton(type: .system)
+        okButton.translatesAutoresizingMaskIntoConstraints = false
+        okButton.setTitle("Ok", for: .normal)
+        okButton.addTarget(self, action: #selector(okButtonTapped), for: .touchUpInside)
+        ipDialogBackground.addSubview(okButton)
+        
+        NSLayoutConstraint.activate([
+            skipButton.topAnchor.constraint(equalTo: ipTextField.bottomAnchor, constant: 20),
+            skipButton.leadingAnchor.constraint(equalTo: ipDialogBackground.leadingAnchor, constant: 20),
+            skipButton.widthAnchor.constraint(equalTo: ipDialogBackground.widthAnchor, multiplier: 0.4, constant: -30),
+            skipButton.heightAnchor.constraint(equalToConstant: 30),
+            
+            okButton.topAnchor.constraint(equalTo: ipTextField.bottomAnchor, constant: 20),
+            okButton.trailingAnchor.constraint(equalTo: ipDialogBackground.trailingAnchor, constant: -20),
+            okButton.widthAnchor.constraint(equalTo: ipDialogBackground.widthAnchor, multiplier: 0.4, constant: -30),
+            okButton.heightAnchor.constraint(equalToConstant: 30)
+        ])
+    }
+    
+    @objc func skipButtonTapped() {
+        dismissDialog()
+    }
+    
+    @objc func okButtonTapped() {
+        if let ipAddress = ipTextField.text {
+            communicationManager = CommunicationManager(host: ipAddress)
+            communicationManager?.onDataReceived = { message in
+                self.handleReceivedResult(message: message)
+            }
+        }
+        
+        dismissDialog()
+    }
+    
+    func dismissDialog() {
+        ipDialogView.removeFromSuperview()
+        
+        DispatchQueue.main.async {
+            self.promptTargetEyeSelection()
+        }
     }
     
     func promptTargetEyeSelection() {
@@ -264,7 +349,7 @@ class LiveFeedViewController: UIViewController {
     
     func endTest(result: Double) {
         isTestRunning = false
-        let resultString = String(format: "%.1f", result)
+        let resultString = String(format: "%.2f", result)
         showAnswerEffect(imageName: "gift_box",
                          labelText: "수고하셨습니다! 검사결과는 \(resultString)입니다!",
                          soundName: "congraturation",

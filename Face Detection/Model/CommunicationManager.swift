@@ -50,10 +50,9 @@ class CommunicationManager {
                 // process received data
                 if let str = String(data: data, encoding: .utf8) {
                     print("Received data: \(str)")
-                    self.onDataReceived?(str)
+                    let message = str.trimmingCharacters(in: .newlines)
+                    self.onDataReceived?(message)
                 }
-                
-
             }
             
             if let error = error {
