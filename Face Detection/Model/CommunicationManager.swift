@@ -7,11 +7,67 @@
 //
 
 import Foundation
+import Network
 
-//TODO: 여기는 rest api와 iPad를 찾는 코드가 들어갈 예정
+class CommunicationManager {
+    private var connection: NWConnection?
+    
+    var onDataReceived: ((String) -> Void)?
+    
+    init(host: String = "1.233.218.30", port: NWEndpoint.Port=9099) {
+        let params = NWParameters.tcp
+        
+        let endpoint = NWEndpoint.hostPort(host: NWEndpoint.Host(host), port: port)
+        connection = NWConnection(to: endpoint, using: params)
+        
+        connection?.stateUpdateHandler = { newState in
+            if newState == .ready {
+                // Ready to send/receive data
+                self.receiveData()
+            } else if newState == .cancelled {
+                print("Connection cancelled")
+            }
+        }
+        
+        connection?.start(queue: .main)
+    }
+    
+    deinit {
+        // Inform the connection is closing.
+        sendData("close")
+    }
+    
+    func sendData(_ message: String) {
+        let message = "\(message)\n"
+        if let data = message.data(using: .utf8) {
+            connection?.send(content: data, completion: .idempotent)
+        }
+    }
+    
+    private func receiveData() {
+        connection?.receive(minimumIncompleteLength: 1, maximumLength: 65536) { (data, _, isComplete, error) in
+            if let data = data {
+                // process received data
+                if let str = String(data: data, encoding: .utf8) {
+                    print("Received data: \(str)")
+                    self.onDataReceived?(str)
+                }
+                
 
-private func findTargetIP() -> String {
-    return ""
+            }
+            
+            if let error = error {
+                // handle errors
+                print("Error: \(error)")
+            }
+            
+            if isComplete {
+                print("Message received completely.")
+            } else {
+                // if the message is not complete, call receiveData again to receive the rest of the data
+                self.receiveData()
+            }
+            
+        }
+    }
 }
-
-

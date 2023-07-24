@@ -52,6 +52,8 @@ class LiveFeedViewController: UIViewController {
     private var eyeDetectionResultList: [Int] = []
     private var lastEyeDetection: Int64 = 0
     
+    private var communicationManager: CommunicationManager?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupCamera()
@@ -64,6 +66,34 @@ class LiveFeedViewController: UIViewController {
         
         DispatchQueue.main.async {
             self.promptTargetEyeSelection()
+        }
+        
+        //TODO: Change to enter IP information
+        communicationManager = CommunicationManager()
+        communicationManager?.onDataReceived = { message in
+            self.handleReceivedResult(message: message)
+        }
+    }
+    
+    func handleReceivedResult(message: String) {
+        if message.isEmpty {
+            return
+        }
+        
+        if message.lowercased().starts(with: "end") {
+            let testResult = Double(message.split(separator: " ")[1])!
+            
+            DispatchQueue.main.async {
+                self.endTest(result: testResult)
+            }
+        }
+        else
+        {
+            DispatchQueue.main.async {
+                if let isCorrect = Bool(message.filter { !$0.isWhitespace }.lowercased()) {
+                    self.displayAnswerResult(isCorrect: isCorrect)
+                }
+            }
         }
     }
     
@@ -233,8 +263,9 @@ class LiveFeedViewController: UIViewController {
     }
     
     func endTest(result: Double) {
+        isTestRunning = false
         let resultString = String(format: "%.1f", result)
-        showAnswerEffect(imageName: "congraturation",
+        showAnswerEffect(imageName: "gift_box",
                          labelText: "수고하셨습니다! 검사결과는 \(resultString)입니다!",
                          soundName: "congraturation",
                          keepAlive: true)
@@ -273,9 +304,13 @@ class LiveFeedViewController: UIViewController {
             return
         }
         
+        let message = "Answer " + String(sender.tag)
+        
+        communicationManager?.sendData(message)
+        
         if !session.connectedPeers.isEmpty {
             do {
-                try session.send(("Answer " + String(sender.tag)).data(using: .utf8)!, toPeers: session.connectedPeers, with: .reliable)
+                try session.send(message.data(using: .utf8)!, toPeers: session.connectedPeers, with: .reliable)
                 buttonsEnabled = false
             } catch {
                 log.error("Error for sending: \(String(describing: error))")
@@ -429,6 +464,10 @@ extension LiveFeedViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
     }
     
     private func checkIfEyeClosed(isLeftEyeDetected:Bool, isRightDetected: Bool, threshold: Double = 0.7) {
+        if !isTestRunning {
+            return
+        }
+        
         let currentTimestamp = Int64(Date().timeIntervalSince1970 * 1000)
         
         if currentTimestamp - lastEyeDetection > EYE_DETECTION_INTERVAL_MS {
