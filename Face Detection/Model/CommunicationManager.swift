@@ -14,7 +14,7 @@ class CommunicationManager {
     
     var onDataReceived: ((String) -> Void)?
     
-    init(host: String = "1.233.218.30", port: NWEndpoint.Port=9099) {
+    init(host: String, port: NWEndpoint.Port=9099) {
         let params = NWParameters.tcp
         
         let endpoint = NWEndpoint.hostPort(host: NWEndpoint.Host(host), port: port)
