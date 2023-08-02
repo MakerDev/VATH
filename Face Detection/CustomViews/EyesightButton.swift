@@ -31,13 +31,33 @@ class EyesightButton: UIButton {
         layer.cornerRadius = 8.0
         titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
         
-        updateButtonImages()
+        setBackgroundImage(UIImage(named: "button_idle"), for: .normal)
+        setBackgroundImage(UIImage(named: "button_pressed"), for: .highlighted)
+        
+        imageView?.contentMode = .center
     }
     
     private func updateButtonImages() {
-        setBackgroundImage(UIImage(named: "button_idle\(buttonNumber)"), for: .normal)
-        setBackgroundImage(UIImage(named: "button_pressed\(buttonNumber)"), for: .highlighted)
-            
-        imageView?.contentMode = .scaleAspectFit
+        let scale = 0.4
+        if let numberImage = UIImage(named: "img\(buttonNumber)") {
+            let scaledImage = numberImage.scaled(by: scale)
+            setImage(scaledImage, for: .normal)
+            setImage(scaledImage, for: .highlighted)
+        }
+    }
+}
+
+extension UIImage {
+    func scaled(by scale: CGFloat) -> UIImage? {
+        let newWidth = size.width * scale
+        let newHeight = size.height * scale
+        let newSize = CGSize(width: newWidth, height: newHeight)
+        
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0)
+        draw(in: CGRect(origin: .zero, size: newSize))
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return newImage
     }
 }

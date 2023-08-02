@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "button_idle9.png",
+      "filename" : "button_pressed.png",
       "idiom" : "universal",
       "scale" : "1x"
     },

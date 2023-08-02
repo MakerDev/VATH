@@ -32,7 +32,7 @@ class LiveFeedViewController: UIViewController {
     private let eyeDetectionLabel = UILabel()
     private let messageLabel = UILabel()
     
-    private let buttonTitles = ["2", "3", "5"]
+    private let buttonTitles = ["2", "3", "5", "6", "9"]
     private var buttons: [UIButton] = []
     private var currentImage: CIImage? = nil
     
@@ -231,11 +231,8 @@ class LiveFeedViewController: UIViewController {
     func setupButtons() {
         for (_, number) in buttonTitles.enumerated() {
             // let button = UIButton(frame: CGRect(x: CGFloat(index) * buttonWidth, y: buttonYPosition, width: buttonWidth, height: buttonHeight))
-            let button = UIButton(type: .system)
-            button.titleLabel?.font = UIFont.systemFont(ofSize: 84)
-            button.setTitleColor(.white, for: .normal)
-            button.setTitle(number, for: .normal)
-            button.backgroundColor = #colorLiteral(red: 0, green: 0.7947641015, blue: 0.8564413786, alpha: 1)
+            let button = EyesightButton()
+            button.buttonNumber = Int(number)!
             button.tag = Int(number)!
             button.addTarget(self, action: #selector(answerButtonTapped(_:)), for: .touchUpInside)
             buttons.append(button)
@@ -244,7 +241,8 @@ class LiveFeedViewController: UIViewController {
         let stackView = UIStackView(arrangedSubviews: buttons)
         stackView.axis = .vertical
         stackView.distribution = .fillEqually
-        stackView.spacing = 16
+        stackView.alignment = .center
+        stackView.spacing = 0
         
         view.addSubview(stackView)
         
