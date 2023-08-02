@@ -25,6 +25,7 @@
 		418A54302A6A56FB00A295E0 /* right-eye-voice.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 418A542C2A6A56FB00A295E0 /* right-eye-voice.mp3 */; };
 		418A54312A6A56FB00A295E0 /* test-done-voice.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 418A542D2A6A56FB00A295E0 /* test-done-voice.mp3 */; };
 		418A54322A6A56FB00A295E0 /* left-eye-voice.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 418A542E2A6A56FB00A295E0 /* left-eye-voice.mp3 */; };
+		418A54372A7A87BC00A295E0 /* EyesightButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418A54362A7A87BC00A295E0 /* EyesightButton.swift */; };
 		419B60A32A10E82B00A47EE9 /* haarcascade_eye.xml in Resources */ = {isa = PBXBuildFile; fileRef = 419B60A12A10E79C00A47EE9 /* haarcascade_eye.xml */; };
 		419E808B2A10E49C00D48156 /* MyOpenCV.mm in Sources */ = {isa = PBXBuildFile; fileRef = 419E808A2A10E49C00D48156 /* MyOpenCV.mm */; };
 		AA5029E024BEECD4006576A4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5029DF24BEECD4006576A4 /* AppDelegate.swift */; };
@@ -58,6 +59,7 @@
 		418A542C2A6A56FB00A295E0 /* right-eye-voice.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "right-eye-voice.mp3"; sourceTree = "<group>"; };
 		418A542D2A6A56FB00A295E0 /* test-done-voice.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "test-done-voice.mp3"; sourceTree = "<group>"; };
 		418A542E2A6A56FB00A295E0 /* left-eye-voice.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "left-eye-voice.mp3"; sourceTree = "<group>"; };
+		418A54362A7A87BC00A295E0 /* EyesightButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyesightButton.swift; sourceTree = "<group>"; };
 		419B60A12A10E79C00A47EE9 /* haarcascade_eye.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = haarcascade_eye.xml; path = ../../Downloads/haarcascade_eye.xml; sourceTree = "<group>"; };
 		419B60A22A10E7CA00A47EE9 /* haarcascade_eye.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = haarcascade_eye.xml; sourceTree = "<group>"; };
 		419E80892A10E49C00D48156 /* MyOpenCV.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MyOpenCV.h; path = "Face Detection/OpenCVWrapper/MyOpenCV.h"; sourceTree = SOURCE_ROOT; };
@@ -177,6 +179,14 @@
 			path = Sounds;
 			sourceTree = "<group>";
 		};
+		418A54352A7A87A700A295E0 /* CustomViews */ = {
+			isa = PBXGroup;
+			children = (
+				418A54362A7A87BC00A295E0 /* EyesightButton.swift */,
+			);
+			path = CustomViews;
+			sourceTree = "<group>";
+		};
 		AA5029D324BEECD4006576A4 = {
 			isa = PBXGroup;
 			children = (
@@ -201,6 +211,7 @@
 		AA5029DE24BEECD4006576A4 /* Face Detection */ = {
 			isa = PBXGroup;
 			children = (
+				418A54352A7A87A700A295E0 /* CustomViews */,
 				414ED3D92A0E5B0B00DEC4C7 /* Face Detection-Bridging-Header.h */,
 				417594BB2A16105300FDC81D /* OpenCVWrapper */,
 				417594BA2A16103E00FDC81D /* Controllers */,
@@ -335,6 +346,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				418A54212A6987C800A295E0 /* AudioController.swift in Sources */,
+				418A54372A7A87BC00A295E0 /* EyesightButton.swift in Sources */,
 				AA5029F624BEF5EE006576A4 /* LiveFeedViewController.swift in Sources */,
 				AA5029E424BEECD4006576A4 /* ViewController.swift in Sources */,
 				41734CF92A160632000AC57A /* CameraCapturedData.swift in Sources */,
@@ -499,6 +511,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1.1;
 				DEVELOPMENT_TEAM = 357UTQ5SQ3;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "$(SRCROOT)/PrefixHeader.pch";
@@ -529,6 +542,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1.1;
 				DEVELOPMENT_TEAM = 357UTQ5SQ3;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "$(SRCROOT)/PrefixHeader.pch";

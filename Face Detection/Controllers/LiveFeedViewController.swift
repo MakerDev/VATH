@@ -131,7 +131,7 @@ class LiveFeedViewController: UIViewController {
         ipTextField = UITextField()
         ipTextField.translatesAutoresizingMaskIntoConstraints = false
         ipTextField.borderStyle = .roundedRect
-        ipTextField.placeholder = "Enter your text"
+        ipTextField.placeholder = "노트북 화면에 표시된 ip주소를 입력해주세요"
         ipDialogBackground.addSubview(ipTextField)
         
         NSLayoutConstraint.activate([
@@ -144,14 +144,14 @@ class LiveFeedViewController: UIViewController {
         // Create the "Skip" button
         let skipButton = UIButton(type: .system)
         skipButton.translatesAutoresizingMaskIntoConstraints = false
-        skipButton.setTitle("Skip", for: .normal)
+        skipButton.setTitle("건너뛰기", for: .normal)
         skipButton.addTarget(self, action: #selector(skipButtonTapped), for: .touchUpInside)
         ipDialogBackground.addSubview(skipButton)
         
         // Create the "Ok" button
         let okButton = UIButton(type: .system)
         okButton.translatesAutoresizingMaskIntoConstraints = false
-        okButton.setTitle("Ok", for: .normal)
+        okButton.setTitle("확인", for: .normal)
         okButton.addTarget(self, action: #selector(okButtonTapped), for: .touchUpInside)
         ipDialogBackground.addSubview(okButton)
         
@@ -194,12 +194,12 @@ class LiveFeedViewController: UIViewController {
     func promptTargetEyeSelection() {
         let alertController = UIAlertController(title: "검사 타겟", message: "어느 쪽 눈의 시력 검사를 진행하시나요?", preferredStyle: .alert)
         
-        let option1Action = UIAlertAction(title: "왼쪽", style: .default) { _ in
+        let option1Action = UIAlertAction(title: "왼눈", style: .default) { _ in
             self.isTargetLeftEye = true
             self.isTestRunning = true
         }
         
-        let option2Action = UIAlertAction(title: "오른쪽", style: .default) { _ in
+        let option2Action = UIAlertAction(title: "오른눈", style: .default) { _ in
             self.isTargetLeftEye = false
             self.isTestRunning = true
         }
@@ -232,7 +232,7 @@ class LiveFeedViewController: UIViewController {
         for (_, number) in buttonTitles.enumerated() {
             // let button = UIButton(frame: CGRect(x: CGFloat(index) * buttonWidth, y: buttonYPosition, width: buttonWidth, height: buttonHeight))
             let button = UIButton(type: .system)
-            button.titleLabel?.font = UIFont.systemFont(ofSize: 24)
+            button.titleLabel?.font = UIFont.systemFont(ofSize: 84)
             button.setTitleColor(.white, for: .normal)
             button.setTitle(number, for: .normal)
             button.backgroundColor = #colorLiteral(red: 0, green: 0.7947641015, blue: 0.8564413786, alpha: 1)
@@ -539,10 +539,10 @@ extension LiveFeedViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             }
             
             checkIfEyeClosed(isLeftEyeDetected: isRightEyeDetected, isRightDetected: isLeftEyeDetected)
-            DispatchQueue.main.async {
-                // As the captured image is mirrored, left and right detection results should be reversly displayed.
-                self.eyeDetectionLabel.text = "Left: \(isRightEyeDetected)   Right: \(isLeftEyeDetected)"
-            }
+//            DispatchQueue.main.async {
+//                // As the captured image is mirrored, left and right detection results should be reversly displayed.
+//                self.eyeDetectionLabel.text = "Left: \(isRightEyeDetected)   Right: \(isLeftEyeDetected)"
+//            }
         }
         
         lastDetection = currentTimestamp
