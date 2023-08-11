@@ -31,7 +31,7 @@ class EyesightButton: UIButton {
         layer.cornerRadius = 8.0
         titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
         
-        setBackgroundImage(UIImage(named: "button_idle"), for: .normal)
+        setBackgroundImage(UIImage(named: "button_idle_white"), for: .normal)
         setBackgroundImage(UIImage(named: "button_pressed"), for: .highlighted)
         
         imageView?.contentMode = .center

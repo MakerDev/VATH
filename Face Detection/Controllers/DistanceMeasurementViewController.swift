@@ -11,6 +11,7 @@ import Vision
 import AVFoundation
 import CoreImage
 import Foundation
+import ARKit
 
 protocol CaptureDataReceiver: AnyObject {
     func onNewData(capturedData: CameraCapturedData)
@@ -157,8 +158,15 @@ class DistanceMeasurementViewController: UIViewController {
     }
     
     private func setupCaptureInput() throws {
+        let isLidarSupported = ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh)
+        
+        var cameraType = AVCaptureDevice.DeviceType.builtInDualCamera
+        if isLidarSupported {
+            cameraType = AVCaptureDevice.DeviceType.builtInLiDARDepthCamera
+        }
+        
         // Look up the LiDAR camera.
-        guard let device = AVCaptureDevice.default(.builtInLiDARDepthCamera, for: .video, position: .back) else {
+        guard let device = AVCaptureDevice.default(cameraType, for: .video, position: .back) else {
             throw ConfigurationError.lidarDeviceUnavailable
         }
         

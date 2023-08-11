@@ -66,6 +66,7 @@ class LiveFeedViewController: UIViewController {
         setupMCService()
         setupLabels()
         setupDialog()
+        self.view.backgroundColor = UIColor(red: 143/255, green: 170/255, blue: 220/255, alpha: 1)
     }
     
     func handleReceivedResult(message: String) {
@@ -242,16 +243,21 @@ class LiveFeedViewController: UIViewController {
         stackView.axis = .vertical
         stackView.distribution = .fillEqually
         stackView.alignment = .center
-        stackView.spacing = 0
+        stackView.spacing = 6
+        stackView.translatesAutoresizingMaskIntoConstraints = false
         
         view.addSubview(stackView)
         
         stackView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: view.topAnchor),
-            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            stackView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+//            stackView.topAnchor.constraint(equalTo: view.topAnchor),
+//            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+//            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+//            stackView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            stackView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.95),
+            stackView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.95),
+            stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
     }
     
